@@ -7,5 +7,7 @@ if (-not $exe) {
     Write-Error 'Godot nao encontrado em tools/godot/. Veja docs/ARCHITECTURE.md (secao Ambiente).'
 }
 # O executavel "console" mostra a saida no terminal e espera o Godot terminar.
+# 'Continue': avisos do Godot (stderr) nao devem interromper o script.
+$ErrorActionPreference = 'Continue'
 & $exe.FullName @args
 exit $LASTEXITCODE
