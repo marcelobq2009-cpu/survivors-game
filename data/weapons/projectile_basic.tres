@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://game/weapons/projectile_weapon.tscn" id="1_86mb2"]
+[ext_resource type="Script" path="res://game/weapons/weapon_data.gd" id="2_ksada"]
+[ext_resource type="Texture2D" path="res://assets/sprites/placeholder/circle.png" id="3_in4x8"]
+
+[resource]
+script = ExtResource("2_ksada")
+id = &"projectile_basic"
+display_name = "Projetil"
+description = "Atira no inimigo mais proximo."
+scene = ExtResource("1_86mb2")
+damage = 6.0
+cooldown = 0.8
+area = 9.0
+projectile_speed = 560.0
+lifetime = 1.4
+target_range = 520.0
+texture = ExtResource("3_in4x8")
+color = Color(1, 0.95, 0.4, 1)
