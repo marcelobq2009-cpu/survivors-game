@@ -5,7 +5,7 @@ tools/
 # Saida dos builds
 build/
 # Gerado no build (versao + hash do commit)
-game/build_info.gd
+game/build_info.gd*
 # Segredos de exportacao (keystore etc.)
 export_credentials.cfg
 *.keystore
