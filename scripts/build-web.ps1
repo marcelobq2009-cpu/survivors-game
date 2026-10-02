@@ -21,6 +21,13 @@ try {
     & $godot --headless --import | Out-Null
     & $godot --headless --export-release 'Web' 'build/web/index.html'
     $code = $LASTEXITCODE
+
+    # Cache-busting: o GitHub Pages manda o navegador guardar arquivos por 10 min.
+    # Com ?v=<commit> no pacote do jogo, cada build nova e baixada na hora.
+    $html = Join-Path $root 'build\web\index.html'
+    $v = $commit.Replace('+', '')
+    $content = [IO.File]::ReadAllText($html).Replace('"executable":"index"', "`"executable`":`"index`",`"mainPack`":`"index.pck?v=$v`"")
+    [IO.File]::WriteAllText($html, $content)
     Write-Host "Build web pronta em build/web/ (commit $commit)"
 } finally {
     Pop-Location

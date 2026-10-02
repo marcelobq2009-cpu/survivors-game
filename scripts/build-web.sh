@@ -14,4 +14,9 @@ mkdir -p build/web
 touch build/.gdignore
 ./scripts/godot.sh --headless --import >/dev/null 2>&1 || true
 ./scripts/godot.sh --headless --export-release "Web" build/web/index.html
+
+# Cache-busting: o GitHub Pages manda o navegador guardar arquivos por 10 min.
+# Com ?v=<commit> no pacote do jogo, cada build nova e baixada na hora.
+sed -i "s/\"executable\":\"index\"/\"executable\":\"index\",\"mainPack\":\"index.pck?v=${COMMIT//+/}\"/" build/web/index.html
+grep -q "index.pck?v=" build/web/index.html || { echo "ERRO: cache-busting nao aplicado" >&2; exit 1; }
 echo "Build web pronta em build/web/ (commit $COMMIT)"
