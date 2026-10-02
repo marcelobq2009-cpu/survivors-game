@@ -12,6 +12,7 @@ _Última atualização: 2026-10-02_
 - 41 testes GUT (XP, vida, stats, sorteio, ondas, pool, grade, integração da partida).
 - Web: preset sem threads; GitHub Actions testa e publica no Pages a cada push na `main`.
 - Menu mostra versão + hash do commit. Hook `SessionStart` para sessões na nuvem.
+- Cache-busting: `index.pck?v=<commit>` no `index.html` (Pages tem cache de 10 min).
 - Contexto para o Claude: `CLAUDE.md`, docs, subagentes e comandos.
 
 ## Falta / próximos passos
