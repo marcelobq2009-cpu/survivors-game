@@ -3,6 +3,9 @@ extends RefCounted
 ## Grade espacial: divide o mundo em celulas para responder rapido
 ## "quem esta perto deste ponto?" sem testar todos os inimigos.
 ## E reconstruida a cada frame pelo EnemyManager (clear + insert).
+##
+## IMPORTANTE: usa `position` dos itens (mais barato que global_position).
+## Os itens devem ser filhos de um no que esta na origem do mundo.
 
 var cell_size: float
 var _cells: Dictionary[Vector2i, Array] = {}
@@ -23,10 +26,12 @@ func size() -> int:
 
 
 func insert(item: Node2D) -> void:
-	var c := cell_of(item.global_position)
-	if not _cells.has(c):
-		_cells[c] = []
-	_cells[c].append(item)
+	var c := cell_of(item.position)
+	var cell: Variant = _cells.get(c)
+	if cell == null:
+		_cells[c] = [item]
+	else:
+		(cell as Array).append(item)
 	_count += 1
 
 
@@ -43,9 +48,11 @@ func query_radius(pos: Vector2, radius: float, result: Array[Node2D]) -> void:
 	var max_c := cell_of(pos + Vector2(radius, radius))
 	for cx: int in range(min_c.x, max_c.x + 1):
 		for cy: int in range(min_c.y, max_c.y + 1):
-			var cell: Array = _cells.get(Vector2i(cx, cy), [])
-			for item: Node2D in cell:
-				if item.global_position.distance_squared_to(pos) <= r2:
+			var cell: Variant = _cells.get(Vector2i(cx, cy))
+			if cell == null:
+				continue
+			for item: Node2D in cell as Array:
+				if item.position.distance_squared_to(pos) <= r2:
 					result.append(item)
 
 
@@ -65,9 +72,11 @@ func find_nearest(pos: Vector2, max_radius: float) -> Node2D:
 			for cy: int in range(center.y - ring, center.y + ring + 1):
 				if maxi(absi(cx - center.x), absi(cy - center.y)) != ring:
 					continue  # So a borda do anel.
-				var cell: Array = _cells.get(Vector2i(cx, cy), [])
-				for item: Node2D in cell:
-					var d2 := item.global_position.distance_squared_to(pos)
+				var cell: Variant = _cells.get(Vector2i(cx, cy))
+				if cell == null:
+					continue
+				for item: Node2D in cell as Array:
+					var d2 := item.position.distance_squared_to(pos)
 					if d2 <= best_d2:
 						best_d2 = d2
 						best = item

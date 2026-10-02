@@ -13,6 +13,7 @@ config_version=5
 config/name="Survivors Game"
 config/description="Prototipo survivors-like (base reskinavel)."
 config/version="0.1.0"
+run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
@@ -41,6 +42,10 @@ window/handheld/orientation=1
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[gui]
+
+theme/custom="res://ui/main_theme.tres"
 
 [input]
 
