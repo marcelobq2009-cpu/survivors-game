@@ -1,5 +1,36 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/test.sh)",
+      "Bash(./scripts/test.sh *)",
+      "Bash(./scripts/build-web.sh)",
+      "Bash(./scripts/run.sh *)",
+      "Bash(./scripts/godot.sh --headless *)",
+      "Bash(./scripts/setup-godot.sh *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "PowerShell(.\\scripts\\test.ps1)",
+      "PowerShell(.\\scripts\\test.ps1 *)",
+      "PowerShell(.\\scripts\\build-web.ps1)",
+      "PowerShell(.\\scripts\\run.ps1 *)",
+      "PowerShell(.\\scripts\\godot.ps1 --headless *)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)"
+    ],
+    "deny": [
+      "Read(./.godot/**)",
+      "Read(./addons/**)",
+      "Read(./assets/sprites/**)",
+      "Read(./assets/audio/**)",
+      "Read(./assets/fonts/**)",
+      "Read(./build/**)",
+      "Read(./tools/**)",
+      "Read(./**/*.import)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
