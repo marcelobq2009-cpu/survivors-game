@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_ybnct"]
+[ext_resource type="Resource" path="res://data/weapons/projectile_basic.tres" id="2_6pu8v"]
+
+[resource]
+script = ExtResource("1_ybnct")
+id = &"projectile_damage"
+title = "Projetil: +Dano"
+description = "+3 de dano por projetil."
+kind = 1
+weapon = ExtResource("2_6pu8v")
+stat = &"damage"
+value = 3.0
+max_picks = 6
+color = Color(1, 0.85, 0.35, 1)

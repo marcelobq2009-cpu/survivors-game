@@ -8,6 +8,7 @@ extends Node
 signal run_started
 signal run_ended(victory: bool)
 signal game_paused(paused: bool)
+signal pause_requested  ## Ex.: botao de pausa do HUD (toque).
 
 # --- Jogador ---
 signal player_contact(damage: float)  ## Um inimigo encostou no jogador.
@@ -16,7 +17,7 @@ signal player_health_changed(current: float, max_value: float)
 signal player_died
 
 # --- Combate ---
-signal enemy_killed(position: Vector2, xp_value: int)
+signal enemy_killed(position: Vector2, xp_value: int, color: Color)
 signal damage_dealt(position: Vector2, amount: float)
 
 # --- Progressao ---

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_oeyfb"]
+
+[resource]
+script = ExtResource("1_oeyfb")
+id = &"player_pickup"
+title = "+Ima"
+description = "Coleta XP de mais longe."
+stat = &"pickup_radius"
+value = 35.0
+max_picks = 4
+weight = 0.8
+color = Color(0.45, 0.85, 1, 1)

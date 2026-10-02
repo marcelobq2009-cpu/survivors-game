@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PlayerData" format=3]
+
+[ext_resource type="Script" path="res://game/player/player_data.gd" id="1_wx8at"]
+[ext_resource type="Resource" path="res://data/weapons/projectile_basic.tres" id="2_jr2o1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/placeholder/circle.png" id="3_bihp7"]
+
+[resource]
+script = ExtResource("1_wx8at")
+starting_weapon = ExtResource("2_jr2o1")
+texture = ExtResource("3_bihp7")

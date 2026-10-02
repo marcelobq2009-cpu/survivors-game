@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="XpCurve" format=3]
+
+[ext_resource type="Script" path="res://game/player/xp_curve.gd" id="1_go8dk"]
+
+[resource]
+script = ExtResource("1_go8dk")
