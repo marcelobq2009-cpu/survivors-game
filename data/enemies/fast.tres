@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_fo1no"]
+[ext_resource type="Texture2D" path="res://assets/sprites/placeholder/triangle.png" id="2_87vl3"]
+
+[resource]
+script = ExtResource("1_fo1no")
+id = &"fast"
+display_name = "Rapido"
+max_health = 6.0
+speed = 135.0
+contact_damage = 4.0
+radius = 12.0
+texture = ExtResource("2_87vl3")
+color = Color(1, 0.6, 0.2, 1)

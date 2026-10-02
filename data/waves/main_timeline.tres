@@ -1,0 +1,98 @@
+[gd_resource type="Resource" script_class="WaveTimeline" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/wave_timeline.gd" id="1_nv7ym"]
+[ext_resource type="Script" path="res://game/enemies/wave_data.gd" id="2_o1hyv"]
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="3_kgjgh"]
+[ext_resource type="Resource" path="res://data/enemies/basic.tres" id="4_ggguk"]
+[ext_resource type="Resource" path="res://data/enemies/fast.tres" id="5_3dwc6"]
+[ext_resource type="Resource" path="res://data/enemies/tank.tres" id="6_elt0m"]
+
+[sub_resource type="Resource" id="Resource_7h3b2"]
+script = ExtResource("2_o1hyv")
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk")])
+spawn_count = 2
+max_alive = 30
+
+[sub_resource type="Resource" id="Resource_e16wp"]
+script = ExtResource("2_o1hyv")
+start_time = 60.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk")])
+spawn_interval = 0.8
+spawn_count = 3
+max_alive = 60
+
+[sub_resource type="Resource" id="Resource_uvx2i"]
+script = ExtResource("2_o1hyv")
+start_time = 120.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("4_ggguk"), ExtResource("5_3dwc6")])
+spawn_interval = 0.8
+spawn_count = 4
+max_alive = 90
+health_multiplier = 1.2
+
+[sub_resource type="Resource" id="Resource_5rp6u"]
+script = ExtResource("2_o1hyv")
+start_time = 180.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("5_3dwc6")])
+spawn_interval = 0.7
+spawn_count = 5
+max_alive = 130
+health_multiplier = 1.4
+
+[sub_resource type="Resource" id="Resource_k3til"]
+script = ExtResource("2_o1hyv")
+start_time = 240.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("5_3dwc6"), ExtResource("6_elt0m")])
+spawn_interval = 0.7
+spawn_count = 6
+max_alive = 170
+health_multiplier = 1.6
+
+[sub_resource type="Resource" id="Resource_i5dxi"]
+script = ExtResource("2_o1hyv")
+start_time = 300.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("5_3dwc6"), ExtResource("5_3dwc6"), ExtResource("6_elt0m")])
+spawn_interval = 0.6
+spawn_count = 7
+max_alive = 210
+health_multiplier = 1.9
+
+[sub_resource type="Resource" id="Resource_xjfg0"]
+script = ExtResource("2_o1hyv")
+start_time = 360.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("5_3dwc6"), ExtResource("6_elt0m")])
+spawn_interval = 0.5
+spawn_count = 8
+max_alive = 260
+health_multiplier = 2.2
+
+[sub_resource type="Resource" id="Resource_gk7iy"]
+script = ExtResource("2_o1hyv")
+start_time = 420.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("5_3dwc6"), ExtResource("6_elt0m"), ExtResource("6_elt0m")])
+spawn_interval = 0.5
+spawn_count = 10
+max_alive = 300
+health_multiplier = 2.6
+
+[sub_resource type="Resource" id="Resource_grxsc"]
+script = ExtResource("2_o1hyv")
+start_time = 480.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("4_ggguk"), ExtResource("5_3dwc6"), ExtResource("6_elt0m")])
+spawn_interval = 0.4
+spawn_count = 12
+max_alive = 350
+health_multiplier = 3.0
+
+[sub_resource type="Resource" id="Resource_58sam"]
+script = ExtResource("2_o1hyv")
+start_time = 540.0
+enemies = Array[ExtResource("3_kgjgh")]([ExtResource("5_3dwc6"), ExtResource("6_elt0m")])
+spawn_interval = 0.4
+spawn_count = 14
+max_alive = 400
+health_multiplier = 3.5
+
+[resource]
+script = ExtResource("1_nv7ym")
+waves = Array[ExtResource("2_o1hyv")]([SubResource("Resource_7h3b2"), SubResource("Resource_e16wp"), SubResource("Resource_uvx2i"), SubResource("Resource_5rp6u"), SubResource("Resource_k3til"), SubResource("Resource_i5dxi"), SubResource("Resource_xjfg0"), SubResource("Resource_gk7iy"), SubResource("Resource_grxsc"), SubResource("Resource_58sam")])

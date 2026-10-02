@@ -12,3 +12,5 @@ extends Resource
 @export var spawn_count: int = 1
 ## Limite de inimigos vivos ao mesmo tempo nesta onda.
 @export var max_alive: int = 50
+## Multiplica a vida dos inimigos desta onda (dificuldade crescente).
+@export var health_multiplier: float = 1.0
