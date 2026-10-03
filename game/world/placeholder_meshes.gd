@@ -91,7 +91,8 @@ static func _begin() -> SurfaceTool:
 
 static func _finish(st: SurfaceTool) -> ArrayMesh:
 	var mesh := st.commit()
-	mesh.surface_set_material(0, vertex_color_material())
+	if mesh.get_surface_count() > 0:  # Pedaco vazio (sem nada dentro) nao tem superficie.
+		mesh.surface_set_material(0, vertex_color_material())
 	return mesh
 
 

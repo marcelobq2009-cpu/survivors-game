@@ -95,3 +95,22 @@ func test_cooldown_blocks_spam() -> void:
 	Audio._last_ms.erase(def.id)
 	assert_true(Audio._allowed(def))
 	assert_false(Audio._allowed(def), "bloqueado pelo intervalo minimo")
+
+
+func test_spatial_sound_distance_and_side() -> void:
+	# Som posicional sem AudioStreamPlayer3D: volume pela distancia, lado por bus com panner.
+	var mono := Audio._settings.mono_audio
+	Audio._settings.mono_audio = false
+	Audio.set_listener(Vector2.ZERO, Vector3.RIGHT)
+	assert_almost_eq(Audio._distance_db(Vector2(3, 0)), 0.0, 0.01, "perto: volume cheio")
+	assert_lt(Audio._distance_db(Vector2(30, 0)), -6.0, "longe: mais baixo")
+	assert_eq(Audio._distance_db(Vector2(80, 0)), Audio.SILENT_DB, "fora do alcance: silencio")
+	assert_eq(Audio._side_bus(&"Zombies", Vector2(10, 0)), &"Zombies_R")
+	assert_eq(Audio._side_bus(&"Zombies", Vector2(-10, 0)), &"Zombies_L")
+	assert_eq(Audio._side_bus(&"Zombies", Vector2(1, 0)), &"Zombies", "na frente: centro")
+	assert_eq(Audio._side_bus(&"UI", Vector2(10, 0)), &"UI", "interface nunca tem lado")
+	for bus: StringName in [&"SFX_L", &"SFX_R", &"Zombies_L", &"Alerts_R"]:
+		assert_gt(AudioServer.get_bus_index(bus), 0, "bus de lado %s criado" % bus)
+	Audio._settings.mono_audio = true
+	assert_eq(Audio._side_bus(&"Zombies", Vector2(10, 0)), &"Zombies", "audio mono: sempre centro")
+	Audio._settings.mono_audio = mono

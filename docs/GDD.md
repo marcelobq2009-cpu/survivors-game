@@ -30,7 +30,10 @@ desbloqueios → nova partida.
 | Armas | Pistola, Espingarda, Metralhadora, Facão, Molotov, Gás Lacrimogêneo; evolução: Pistola Rajada |
 | Zumbis | Comum, Corredor, Brutamontes, Inchado (explode), elites dourados |
 | Chefes | Colosso e Mutante (investida), a cada 5 min |
-| Upgrades | ~35 cartas: novas armas, melhorias por arma, passivas (dano, crítico, defesa, utilidade), evolução, cura, ouro |
+| Upgrades | ~35 cartas com raridade (comum, rara, épica): novas armas, melhorias por arma, passivas, evolução, cura, ouro |
+| Eventos | Hordas, chuva de suprimentos, zona tóxica; baú cura 25 |
+| Loja de melhorias | 8 melhorias permanentes compradas com ouro (vida, força, agilidade, ímã, sabedoria, sorte, armadura, recuperação) |
+| Áudio | Música dinâmica em camadas, sons por arma/zumbi/chefe, ambiente do Rio, legendas de alertas (`docs/AUDIO.md`) |
 | Conquistas | Primeira Sobrevivência, Sobreviveu 30 Minutos, 10.000 Zumbis, Matou um Chefe, Sobrevivente do Rio |
 
 ## Builds (exemplos)
@@ -44,6 +47,6 @@ desbloqueios → nova partida.
 - PC: WASD/setas, Esc pausa, F3 overlay.
 
 ## Ideias futuras (não implementado)
-Habilidades ativas por personagem (campo já existe), skins, melhorias permanentes com ouro,
+Habilidades ativas por personagem (campo já existe), skins,
 missões diárias, eventos especiais (chuva, apagão), chefes com padrões, armas de fogo pesado,
 veículos, novas cidades (SP, Salvador, Recife, Manaus), ranking online, música e arte finais.

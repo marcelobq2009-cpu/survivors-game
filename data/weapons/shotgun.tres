@@ -7,7 +7,7 @@
 script = ExtResource("2_yhlrr")
 id = &"shotgun"
 display_name = "Espingarda"
-description = "Leque de chumbo a curta distancia."
+description = "Leque de chumbo a curta distância."
 scene = ExtResource("1_k642q")
 color = Color(1, 0.7, 0.35, 1)
 damage = 6.0

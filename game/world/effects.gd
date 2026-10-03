@@ -229,26 +229,26 @@ func toxic_zone(pos: Vector2, radius: float, warning: float, duration: float) ->
 		tw.tween_property(mat, "albedo_color:a", 0.5, warning / 6.0)
 		tw.tween_property(mat, "albedo_color:a", 0.15, warning / 6.0)
 	# Ativo: nevoa verde forte.
-	tw.tween_property(mat, "albedo_color", Color(0.35, 0.9, 0.15, 0.55), 0.2)
+	tw.tween_property(mat, "albedo_color", Color(0.35, 0.9, 0.15, 0.32), 0.2)
 	tw.tween_interval(maxf(0.0, duration - warning - 0.6))
 	tw.tween_property(mat, "albedo_color:a", 0.0, 0.4)
 	tw.tween_callback(m.queue_free)
 	if not Save.profile.settings.reduced_particles:
 		var fog := CPUParticles3D.new()
-		fog.amount = 14
-		fog.lifetime = 1.6
+		fog.amount = 8
+		fog.lifetime = 1.2
 		fog.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
 		fog.emission_sphere_radius = radius * 0.8
 		fog.direction = Vector3.UP
-		fog.gravity = Vector3(0, 0.6, 0)
-		fog.initial_velocity_max = 0.4
+		fog.gravity = Vector3(0, 0.25, 0)
+		fog.initial_velocity_max = 0.2
 		var sphere := SphereMesh.new()
-		sphere.radius = 0.4
-		sphere.height = 0.8
+		sphere.radius = 0.22
+		sphere.height = 0.44
 		var fm := StandardMaterial3D.new()
 		fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		fm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		fm.albedo_color = Color(0.5, 0.95, 0.2, 0.25)
+		fm.albedo_color = Color(0.5, 0.95, 0.2, 0.14)
 		sphere.material = fm
 		fog.mesh = sphere
 		m.add_child(fog)

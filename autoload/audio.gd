@@ -1,7 +1,7 @@
 extends Node
 ## AudioManager (autoload "Audio"): TODO o som do jogo passa por aqui.
 ##   play(id)                efeito (nao posicional)
-##   play_at(id, pos)        efeito posicional 3D (esquerda/direita, distancia)
+##   play_at(id, pos)        efeito posicional (esquerda/direita, distancia)
 ##   start_loop/stop_loop    sons continuos (gas, fogo, coracao, horda)
 ##   play_music(trilha)      troca de musica com crossfade
 ##   set_intensity(n)        camadas da musica (1 = calma ... 4 = climax)
@@ -11,14 +11,23 @@ extends Node
 ##
 ## Otimizacao: numero fixo de "vozes" reaproveitadas, prioridade (sons
 ## importantes roubam a voz dos menos importantes), limite de copias e
-## intervalo minimo por som. Os sons gerados por codigo sao guardados em cache
+## intervalo minimo por som. O som posicional NAO usa AudioStreamPlayer3D (cada
+## um tocando custava ~20 ms por frame de fisica): o volume cai com a distancia
+## ate o jogador e o lado sai por buses com "panner" (ex.: SFX_L / SFX_R). Os sons gerados por codigo sao guardados em cache
 ## (user://audio_cache) para abrir rapido nas proximas vezes.
 
 const CACHE_DIR := "user://audio_cache/v3/"
 const AUDIO_DIR := "res://assets/audio/"
 const EXTENSIONS: PackedStringArray = ["ogg", "wav", "mp3"]
 const VOICES_2D := 12
-const VOICES_3D := 16
+const VOICES_WORLD := 16
+## Som posicional: volume cheio ate UNIT_DISTANCE metros, some em MAX_DISTANCE.
+const UNIT_DISTANCE := 9.0
+const MAX_DISTANCE := 55.0
+## Distancia lateral (metros) para o som ir todo para um lado.
+const PAN_DISTANCE := 12.0
+const PAN_AMOUNT := 0.6
+const SPATIAL_BUSES: Array[StringName] = [&"SFX", &"Ambience", &"Zombies", &"Bosses", &"Alerts"]
 const VOICES_UI := 5
 const BAKE_BUDGET_MS := 5
 const MUSIC_FADE := 1.4
@@ -38,9 +47,12 @@ var _last_ms: Dictionary = {}
 var _bake_queue: Array[StringName] = []
 var _voices_2d: Array[AudioStreamPlayer] = []
 var _voices_ui: Array[AudioStreamPlayer] = []
-var _voices_3d: Array[AudioStreamPlayer3D] = []
+var _voices_world: Array[AudioStreamPlayer] = []
 var _voice_info: Dictionary = {}    # player -> [id, priority]
-var _loops: Dictionary = {}         # chave -> AudioStreamPlayer/3D
+var _loops: Dictionary = {}         # chave -> AudioStreamPlayer
+var _loop_info: Dictionary = {}     # chave -> [bus, volume_db, pos (Vector2 ou null)]
+var _listener_pos := Vector2.ZERO
+var _listener_right := Vector3.RIGHT
 var _rng := RandomNumberGenerator.new()
 
 # Musica
@@ -79,14 +91,8 @@ func _ready() -> void:
 		_voices_2d.append(_make_player(true))
 	for i: int in VOICES_UI:
 		_voices_ui.append(_make_player(false))
-	for i: int in VOICES_3D:
-		var p := AudioStreamPlayer3D.new()
-		p.process_mode = Node.PROCESS_MODE_PAUSABLE
-		p.unit_size = 9.0
-		p.max_distance = 55.0
-		p.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
-		add_child(p)
-		_voices_3d.append(p)
+	for i: int in VOICES_WORLD:
+		_voices_world.append(_make_player(true))
 	_stinger_player = _make_player(false)
 	_stinger_player.bus = SoundCatalog.BUS_MUSIC
 	for i: int in 2:
@@ -136,81 +142,75 @@ func play(id: StringName, volume_offset_db: float = 0.0, pitch: float = 1.0) -> 
 
 
 ## Toca um efeito posicional no ponto `pos` do chao (Vector2).
-func play_at(id: StringName, pos: Vector2, volume_offset_db: float = 0.0, height: float = 1.0) -> void:
+## Longe demais do jogador: nem toca (economiza vozes).
+func play_at(id: StringName, pos: Vector2, volume_offset_db: float = 0.0) -> void:
 	var def := _def(id)
 	if def == null:
 		return
 	if not def.spatial or _settings == null:
 		play(id, volume_offset_db)
 		return
+	var dist_db := _distance_db(pos)
+	if dist_db <= SILENT_DB:
+		return
 	if not _allowed(def):
 		return
 	var stream := _pick_stream(def)
 	if stream == null:
 		return
-	var p := _take_voice(_voices_3d, def) as AudioStreamPlayer3D
+	var p := _take_voice(_voices_world, def) as AudioStreamPlayer
 	if p == null:
 		return
 	p.stream = stream
-	p.bus = def.bus
-	p.global_position = GroundPlane.to_3d(pos, height)
-	p.volume_db = def.volume_db + volume_offset_db
+	p.bus = _side_bus(def.bus, pos)
+	p.volume_db = def.volume_db + volume_offset_db + dist_db
 	p.pitch_scale = _rng.randf_range(1.0 - def.pitch_var, 1.0 + def.pitch_var)
-	p.panning_strength = 0.0 if _settings.mono_audio else 1.0
 	p.play()
 	_caption(def)
 
 
-## Som continuo identificado por `key`. Com `pos`, fica posicional.
+## Onde esta o "ouvido" (jogador) e o vetor "direita" da camera (lado do som).
+func set_listener(pos: Vector2, camera_right: Vector3) -> void:
+	_listener_pos = pos
+	_listener_right = camera_right
+	for key: StringName in _loops:
+		if _loop_info[key][2] is Vector2:
+			_apply_loop(key)
+
+
+## Som continuo identificado por `key`. Com `pos` (Vector2), fica posicional.
+## Chamar de novo com a mesma chave so atualiza volume e posicao.
 func start_loop(key: StringName, id: StringName, volume_offset_db: float = 0.0,
 		pos: Variant = null) -> void:
 	var def := _def(id)
 	if def == null:
 		return
+	if _loops.has(key):
+		_loop_info[key] = [def.bus, def.volume_db + volume_offset_db, pos]
+		_apply_loop(key)
+		return
 	var stream := _pick_stream(def)
 	if stream == null:
 		return
-	if _loops.has(key):
-		set_loop_volume(key, def.volume_db + volume_offset_db)
-		if pos is Vector2 and _loops[key] is AudioStreamPlayer3D:
-			(_loops[key] as AudioStreamPlayer3D).global_position = GroundPlane.to_3d(pos as Vector2, 1.0)
-		return
-	var p: Node
-	if pos is Vector2:
-		var p3 := AudioStreamPlayer3D.new()
-		p3.unit_size = 8.0
-		p3.max_distance = 45.0
-		p3.global_position = GroundPlane.to_3d(pos as Vector2, 1.0)
-		p3.stream = stream
-		p3.bus = def.bus
-		p3.volume_db = def.volume_db + volume_offset_db
-		p3.process_mode = Node.PROCESS_MODE_PAUSABLE
-		add_child(p3)
-		p3.play()
-		p = p3
-	else:
-		var p2 := _make_player(true)
-		p2.stream = stream
-		p2.bus = def.bus
-		p2.volume_db = def.volume_db + volume_offset_db
-		p2.play()
-		p = p2
+	var p := _make_player(true)
+	p.stream = stream
 	_loops[key] = p
+	_loop_info[key] = [def.bus, def.volume_db + volume_offset_db, pos]
+	_apply_loop(key)
+	p.play()
 	_caption(def)
 
 
 func set_loop_volume(key: StringName, volume_db: float) -> void:
-	var p: Node = _loops.get(key)
-	if p is AudioStreamPlayer:
-		(p as AudioStreamPlayer).volume_db = volume_db
-	elif p is AudioStreamPlayer3D:
-		(p as AudioStreamPlayer3D).volume_db = volume_db
+	if _loops.has(key):
+		_loop_info[key][1] = volume_db
+		_apply_loop(key)
 
 
 func set_loop_position(key: StringName, pos: Vector2) -> void:
-	var p: Node = _loops.get(key)
-	if p is AudioStreamPlayer3D:
-		(p as AudioStreamPlayer3D).global_position = GroundPlane.to_3d(pos, 1.0)
+	if _loops.has(key):
+		_loop_info[key][2] = pos
+		_apply_loop(key)
 
 
 func has_loop(key: StringName) -> bool:
@@ -222,6 +222,7 @@ func stop_loop(key: StringName, fade: float = 0.3) -> void:
 	if p == null:
 		return
 	_loops.erase(key)
+	_loop_info.erase(key)
 	var tw := create_tween()
 	tw.tween_property(p, "volume_db", SILENT_DB, fade)
 	tw.tween_callback(p.queue_free)
@@ -231,6 +232,44 @@ func stop_loop(key: StringName, fade: float = 0.3) -> void:
 func stop_all_loops() -> void:
 	for key: StringName in _loops.keys():
 		stop_loop(key, 0.4)
+
+
+func _apply_loop(key: StringName) -> void:
+	var p := _loops[key] as AudioStreamPlayer
+	var info: Array = _loop_info[key]
+	var bus: StringName = info[0]
+	var db: float = info[1]
+	if info[2] is Vector2:
+		var pos: Vector2 = info[2]
+		db += _distance_db(pos)
+		bus = _side_bus(bus, pos)
+	p.volume_db = maxf(SILENT_DB, db)
+	if p.bus != bus:
+		p.bus = bus
+
+
+## Atenuacao pela distancia ate o ouvido (0 dB perto, SILENT_DB longe demais).
+func _distance_db(pos: Vector2) -> float:
+	var d := pos.distance_to(_listener_pos)
+	if d >= MAX_DISTANCE:
+		return SILENT_DB
+	var db := linear_to_db(UNIT_DISTANCE / maxf(UNIT_DISTANCE, d))
+	# Ultimos 20%: some suave ate o silencio.
+	var edge := clampf((MAX_DISTANCE - d) / (MAX_DISTANCE * 0.2), 0.0, 1.0)
+	return maxf(SILENT_DB, db + linear_to_db(maxf(0.001, edge)))
+
+
+## Bus do lado certo: "SFX" (centro), "SFX_L" ou "SFX_R" (audio mono: sempre centro).
+func _side_bus(bus: StringName, pos: Vector2) -> StringName:
+	if (_settings and _settings.mono_audio) or not SPATIAL_BUSES.has(bus):
+		return bus
+	var offset := GroundPlane.to_3d(pos - _listener_pos, 0.0)
+	var side := offset.dot(_listener_right) / PAN_DISTANCE
+	if side < -0.35:
+		return StringName(String(bus) + "_L")
+	if side > 0.35:
+		return StringName(String(bus) + "_R")
+	return bus
 
 
 ## Abaixa um canal por `seconds` (ex.: efeitos durante o level-up).
@@ -356,8 +395,6 @@ func apply_settings(s: GameSettings) -> void:
 	var limiter := AudioServer.get_bus_effect(0, 0) as AudioEffectHardLimiter
 	if limiter:
 		limiter.ceiling_db = -6.0 if s.reduce_intense else -0.5
-	for p: AudioStreamPlayer3D in _voices_3d:
-		p.panning_strength = 0.0 if s.mono_audio else 1.0
 
 
 ## Durante a partida, a opcao "musica mais baixa no combate" abaixa a musica.
@@ -400,6 +437,19 @@ func _ensure_buses() -> void:
 			var idx := AudioServer.bus_count - 1
 			AudioServer.set_bus_name(idx, bus)
 			AudioServer.set_bus_send(idx, &"Master")
+	# Lados do som posicional (SFX_L, SFX_R...): panner mandando para o bus principal.
+	for bus: StringName in SPATIAL_BUSES:
+		for side: int in [-1, 1]:
+			var bname := StringName(String(bus) + ("_L" if side < 0 else "_R"))
+			if AudioServer.get_bus_index(bname) >= 0:
+				continue
+			AudioServer.add_bus()
+			var idx := AudioServer.bus_count - 1
+			AudioServer.set_bus_name(idx, bname)
+			AudioServer.set_bus_send(idx, bus)
+			var pan := AudioEffectPanner.new()
+			pan.pan = PAN_AMOUNT * side
+			AudioServer.add_bus_effect(idx, pan)
 	# Musica: filtro "abafado" usado na pausa.
 	var mi := AudioServer.get_bus_index(SoundCatalog.BUS_MUSIC)
 	if AudioServer.get_bus_effect_count(mi) == 0:

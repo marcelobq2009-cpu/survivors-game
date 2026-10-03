@@ -292,7 +292,7 @@ func _build_beach() -> void:
 	walk.position = Vector3(0, 0.12, calcadao_z + calcadao_w * 0.5)
 	var mat := StandardMaterial3D.new()
 	mat.albedo_texture = _wave_texture()
-	mat.uv1_scale = Vector3(plane.size.x / 7.0, 1, 1)
+	mat.uv1_scale = Vector3(plane.size.x / 2.4, calcadao_w / 2.4, 1)  # faixas de ~1,2 m, como no real
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	walk.material_override = mat
 	add_child(walk)
@@ -521,7 +521,7 @@ func _build_beach_life(sand_z0: float, calcadao_z: float) -> void:
 		_add_sign("POSTO %d" % posto, GroundPlane.to_3d(p2, 4.3), 28, Color(0.95, 0.25, 0.2))
 		posto += 1
 		x += 55.0
-	_add_sign("COPACABANA", Vector3(0, 0.6, calcadao_z + 3.5), 140, Color(1.0, 0.85, 0.3))
+	_add_sign("COPACABANA", Vector3(0, 0.6, calcadao_z + 3.5), 96, Color(1.0, 0.85, 0.3))
 	_add_sign("AV. ATLÂNTICA", Vector3(-he.x * 0.5, 2.5, calcadao_z - 2.0), 36, Color(0.3, 0.55, 0.95))
 
 

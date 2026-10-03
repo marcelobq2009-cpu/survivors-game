@@ -26,9 +26,12 @@ World            monta mapa + jogador de GameState.setup, conta tempo, encerra p
 ├ Effects        números de dano, partículas, explosões, golpe (pools próprios)
 ├ EnemySpawner   ondas (WaveTimeline) + DifficultyDirector + chefes + hordas
 ├ CameraRig      câmera isométrica independente (zoom, tremor, foco)
+├ AudioDirector  decide o que tocar na partida (música por intensidade, chefes, zumbis, ambiente)
 ├ Player         (instanciado em runtime) CharacterBody3D + armas filhas
 └ Hud / LevelUpScreen / PauseMenu / ResultsScreen / DebugPanel / TutorialOverlay / DebugOverlay
 ```
+Início (`World._start`, assíncrono): tela de carregamento → `map.build_async` (0–70%) →
+`Audio.prepare_for_game` (70–100%) → jogador → sinal `started`.
 A ordem importa: `EnemyManager` reconstrói a grade antes de armas/projéteis buscarem alvos.
 
 ## Autoloads
@@ -40,7 +43,7 @@ A ordem importa: `EnemyManager` reconstrói a grade antes de armas/projéteis bu
 | `Save` | Perfil (`ProfileData`) em JSON versionado, gravação segura (.tmp + .bak) |
 | `GameState` | Partida atual: setup, tempo, abates, XP, ouro, dano por arma, armas, **pausa compartilhada** |
 | `Pool` | Pooling genérico de nós (sobrou do protótipo; os agentes têm pools próprios) |
-| `Audio` | Buses Music/SFX, sons placeholder sintetizados, troca automática por arquivos em `assets/audio/` |
+| `Audio` | AudioManager: 7 canais, vozes com prioridade, loops, música em camadas, ambiente. Ver `docs/AUDIO.md` |
 | `Ranking` | Serviço de ranking; provider atual `LocalRankingProvider` (mock) |
 | `SceneFlow` | Navegação com fade + aviso "gire o celular" |
 
@@ -72,11 +75,13 @@ hordas em anel. No ranqueado, depois do fim da timeline, `overtime_growth_mult` 
 `Config.game.max_active_enemies` limita zumbis vivos (performance).
 
 ## Mapa
-`GameMap` (base) expõe `grid` (`MapGrid`, obstáculos 1 m), `bounds` e `player_spawn`.
+`GameMap` (base) expõe `grid` (`MapGrid`, células de 0,5 m bloqueadas pelo centro), `bounds` e `player_spawn`.
 `CityMap` gera a cidade a partir de um `CityLayout`: quarteirões, prédios (malhas juntadas por
 "pedaço" de 64 m), praças, carros/ônibus, barricadas, postes, entulho, orla com calçadão de ondas,
 quiosques, palmeiras, morro com comunidade, Cristo e Pão de Açúcar. Colisão do jogador: camada 5
 "world". Zumbis contornam obstáculos consultando a grade (custo O(1)).
+Prédios usam `building.gdshader`: abrem um "buraco de visão" em volta do jogador (variável global
+`player_world_pos`), então ele nunca some atrás de um prédio.
 
 ## Como adicionar…
 - **Zumbi**: novo `.tres` em `data/enemies/` + incluir em ondas de `data/waves/*.tres`.
@@ -87,7 +92,8 @@ quiosques, palmeiras, morro com comunidade, Cristo e Pão de Açúcar. Colisão 
 - **Personagem**: `.tres` em `data/characters/` (requisitos opcionais). Modelo: `model_scene`.
 - **Mapa**: `.tres` em `data/maps/` + cena com raiz `GameMap` (ou `CityMap` + novo `CityLayout`).
 - **Conquista**: `.tres` em `data/achievements/` com requisitos.
-- **Som**: arquivo `assets/audio/<id>.ogg|wav` (ids em `autoload/audio.gd`).
+- **Som**: id em `game/audio/sound_catalog.gd`; arquivo real em `assets/audio/<pasta>/<id>_01.ogg` (`docs/AUDIO.md`).
+- **Melhoria permanente (loja de ouro)**: `.tres` `MetaUpgradeData` em `data/meta_upgrades/`.
 - **Ranking online**: classe que estende `RankingProvider`, trocar em `autoload/ranking.gd`.
 
 ## Convenções

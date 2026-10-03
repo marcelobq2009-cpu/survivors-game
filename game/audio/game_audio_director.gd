@@ -6,14 +6,13 @@ extends Node3D
 ## - Ambiente: cidade / orla / morro + sons ocasionais e assinaturas (Cristo, bondinho).
 ## - Feedback: impactos, criticos, mortes, XP (tom sobe em sequencia), ouro,
 ##   vida baixa (coracao), cura, elites, explosoes e eventos.
-## Tambem posiciona o "ouvido" (AudioListener3D) no jogador, alinhado com a
-## camera: som da esquerda da tela sai na esquerda do fone.
+## Tambem informa ao Audio onde esta o "ouvido" (jogador) e para que lado a
+## camera olha: som da esquerda da tela sai na esquerda do fone.
 
 const VOICE_INTERVAL := 0.32
 const VOICE_RADIUS := 15.0
 const LOW_HP := 0.3
 
-var _listener: AudioListener3D
 var _voice_timer: float = 0.0
 var _env_timer: float = 0.0
 var _oneshot_timer: float = 6.0
@@ -31,9 +30,6 @@ var _nearby: Array[EnemyAgent] = []
 
 func _ready() -> void:
 	_rng.randomize()
-	_listener = AudioListener3D.new()
-	add_child(_listener)
-	_listener.make_current()
 	Events.run_started.connect(_on_run_started)
 	Events.run_ended.connect(_on_run_ended)
 	Events.damage_dealt.connect(_on_damage)
@@ -88,8 +84,7 @@ func _process(delta: float) -> void:
 	var rig := CameraRig.find(get_tree())
 	if rig and rig.camera:
 		# Ouvido no jogador, virado como a camera (esquerda da tela = esquerda do fone).
-		_listener.global_transform = Transform3D(rig.camera.global_basis,
-				GroundPlane.to_3d(GameState.player_position, 6.0))
+		Audio.set_listener(GameState.player_position, rig.camera.global_basis.x)
 	if not GameState.is_running:
 		return
 	_xp_combo_timer -= delta

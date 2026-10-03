@@ -5,9 +5,11 @@
 - Todo push na `main` roda testes → exporta web → publica (~3 min). Acompanhe em *Actions* no GitHub.
 - O menu mostra `vX.Y.Z (hash)`: confira se o hash bate com o último commit.
 - Se não atualizar: recarregue a página (o navegador pode usar cache).
-- Debug: toque com 3 dedos mostra FPS e nº de zumbis. Botão DBG (canto superior direito) abre as ferramentas de teste.
+- Debug: escondido no site. Para abrir: toque 7 vezes na versão (canto do menu) → aparecem o botão DBG
+  na partida e a seção Debug nas Configurações. Toque com 3 dedos mostra FPS e nº de zumbis.
 - O jogo é em PAISAGEM. No Android, o primeiro toque pede tela cheia e trava na horizontal; no iPhone, gire o aparelho (aparece um aviso se estiver em pé).
-- Celular fraco? Configurações › Qualidade gráfica › Baixa.
+- Celular fraco? Configurações › Gráficos: Qualidade Baixa, FPS 30, Partículas reduzidas, Zumbis reduzidos.
+- Publicar em loja: checklist, privacidade e classificação em `docs/PUBLISHING.md`.
 
 ## Futuro: Android (APK/AAB) — NÃO configurado ainda
 1. Instalar Android Studio (traz SDK + JDK 17). No Godot: *Editor > Editor Settings > Export > Android* → apontar SDK e JDK.

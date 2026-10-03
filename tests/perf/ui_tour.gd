@@ -1,8 +1,8 @@
 extends Node
 ## Tour visual automatico (nao e teste GUT): passa pelas telas da partida em
 ## momentos fixos, para conferir o visual gravando frames:
-##   scripts/godot.(ps1|sh) --path . res://tests/perf/ui_tour.tscn --write-movie <pasta>/f.png --fixed-fps 30 --quit-after 420
-## Frames aproximados: 90 jogo | 130 level-up | 190 bau | 250 pausa | 300 debug | 400 resultado
+##   scripts/godot.(ps1|sh) --path . res://tests/perf/ui_tour.tscn --write-movie <pasta>/f.png --fixed-fps 30 --quit-after 600
+## Frames aproximados: 130 level-up | 200 bau | 260 pausa | 300 debug | 360-470 eventos/chefe | 580 resultado
 
 const WORLD_SCENE := preload("res://game/world/world.tscn")
 
@@ -27,6 +27,16 @@ func _process(_delta: float) -> void:
 	if not _world.has_started:
 		return
 	_frame += 1
+	# Modo "lugar": so mostra uma regiao do mapa (beach, north).
+	var args := OS.get_cmdline_user_args()
+	if args.has("beach") or args.has("north"):
+		if _frame == 5:
+			var map := GameMap.find(get_tree()) as CityMap
+			var he := map.layout.half_extents
+			var spot := Vector2(-6.0, he.y - 12.0) if args.has("beach") else Vector2(he.x * 0.35 - 6.0, -he.y + 4.0)
+			Player.find(get_tree()).teleport(map.grid.nearest_free(spot))
+			Player.find(get_tree()).health.god_mode = true
+		return
 	match _frame:
 		60:
 			GameState.elapsed = 290.0  # chefe logo, mais zumbis
@@ -46,11 +56,28 @@ func _process(_delta: float) -> void:
 			Events.pause_requested.emit()
 		280:
 			Events.pause_requested.emit()
-			DebugPanel.find(get_tree()).toggle()
+			var dbg := DebugPanel.find(get_tree())
+			if dbg:
+				dbg.toggle()
 		320:
-			DebugPanel.find(get_tree()).toggle()
+			var dbg := DebugPanel.find(get_tree())
+			if dbg:
+				dbg.toggle()
+			var sp := EnemySpawner.find(get_tree())
+			sp.spawn_supply_drop()
+			sp.spawn_toxic_zone()
+			sp.spawn_boss(0)
+			var m := EnemyManager.find(get_tree())
+			var p := GameState.player_position
+			for id: String in ["zombie_runner", "zombie_brute", "zombie_bloater", "zombie_walker"]:
+				var data := load("res://data/enemies/%s.tres" % id) as EnemyData
+				m.spawn(data, p + Vector2(randf_range(-5, 5), randf_range(3, 6)))
+			m.spawn(load("res://data/enemies/zombie_brute.tres") as EnemyData, p + Vector2(4, -3), 1.0, 1.0,
+					1.0, true, sp.director.profile)
+		480:
+			Player.find(get_tree()).last_damage_source = "Colosso"
 			_world.end_run(false)
-		419:
+		599:
 			Save.set_storage_path(Save.DEFAULT_PATH)
 
 

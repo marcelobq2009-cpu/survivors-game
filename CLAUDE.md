@@ -35,6 +35,8 @@ Arte placeholder 3D gerada por código. O dono é iniciante em Godot: explique e
 - **Tipagem estática em tudo** (variável sem tipo = erro). `class_name` nas classes base.
 - **Pausa**: use `GameState.request_pause(self)` / `release_pause(self)` (várias telas pausam juntas).
 - Lógica testável em classes puras (`RefCounted`). Testes que salvam usam `Save.set_storage_path(...)`.
+- **Som**: sempre via `Audio` (ids em `game/audio/sound_catalog.gd`). Nunca `AudioStreamPlayer3D` (pesadíssimo); posicional = `Audio.play_at`.
+- Antes de commitar mudança pesada: rode o estresse (referência: física ~3,5 ms/frame).
 
 ## Regras de trabalho (economizar tokens)
 - Leia **só** os arquivos ligados ao pedido. Use Grep/Glob antes de abrir arquivos grandes.
@@ -48,6 +50,7 @@ Arte placeholder 3D gerada por código. O dono é iniciante em Godot: explique e
 - Sistemas e "como adicionar inimigo/arma/upgrade/personagem/mapa": `docs/ARCHITECTURE.md`
 - Onde paramos, pendências e bugs: `docs/PROGRESS.md`
 - Celular (web hoje; Android/iOS no futuro): `docs/MOBILE.md`
+- Áudio (canais, catálogo, trocar por arquivos): `docs/AUDIO.md` | Loja/privacidade: `docs/PUBLISHING.md`
 
 ## Subagentes e comandos
 - Agentes em `.claude/agents/`: `gameplay-dev`, `ui-mobile`, `qa-tester`, `balance-designer`, `perf-optimizer`.

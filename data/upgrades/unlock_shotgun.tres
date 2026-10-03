@@ -7,7 +7,7 @@
 script = ExtResource("1_8mcwk")
 id = &"unlock_shotgun"
 title = "Nova arma: Espingarda"
-description = "Leque de chumbo a curta distancia."
+description = "Leque de chumbo a curta distância."
 kind = 0
 rarity = 1
 weapon = ExtResource("2_bg45o")

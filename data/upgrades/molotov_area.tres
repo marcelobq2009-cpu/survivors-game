@@ -7,7 +7,7 @@
 script = ExtResource("1_wj48n")
 id = &"molotov_area"
 title = "Molotov: +Área"
-description = "Explosao 20% maior."
+description = "Explosão 20% maior."
 kind = 1
 weapon = ExtResource("2_1j41c")
 stat = &"area"
