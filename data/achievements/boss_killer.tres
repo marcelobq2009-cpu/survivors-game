@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://game/meta/achievement_data.gd" id="1_b11jx"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="2_bbpye"]
+[ext_resource type="Script" path="res://game/meta/requirements/boss_requirement.gd" id="3_haq0s"]
+
+[sub_resource type="Resource" id="Resource_cujrr"]
+script = ExtResource("3_haq0s")
+
+[resource]
+script = ExtResource("1_b11jx")
+reward_gold = 150
+id = &"boss_killer"
+display_name = "Matou um Chefe"
+description = "Derrote um chefe."
+color = Color(1, 0.82, 0.3, 1)
+sort_order = 3
+unlock_requirements = Array[ExtResource("2_bbpye")]([SubResource("Resource_cujrr")])

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_c5fir"]
+[ext_resource type="Script" path="res://game/meta/character_data.gd" id="2_yekly"]
+[ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="3_nnbw6"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="4_iie6d"]
+
+[resource]
+script = ExtResource("2_yekly")
+move_speed = 4.9
+starting_weapon = ExtResource("3_nnbw6")
+passive_name = "Jogo de Cintura"
+passive_description = "+10% de velocidade."
+id = &"survivor"
+display_name = "Sobrevivente"
+description = "Um carioca comum que aprendeu a se virar. Equilibrado em tudo."
+color = Color(0.25, 0.6, 0.9, 1)

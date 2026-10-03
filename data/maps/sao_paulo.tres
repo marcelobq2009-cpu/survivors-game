@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="MapData" format=3]
+
+[ext_resource type="Resource" path="res://data/difficulty/hard_difficulty.tres" id="1_yg45l"]
+[ext_resource type="PackedScene" path="res://game/maps/sao_paulo/sao_paulo_map.tscn" id="2_vwsev"]
+[ext_resource type="Script" path="res://game/meta/map_data.gd" id="3_i6l21"]
+[ext_resource type="Resource" path="res://data/waves/rio_timeline.tres" id="4_ep44r"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="5_gsox4"]
+[ext_resource type="Script" path="res://game/meta/requirements/survive_requirement.gd" id="6_vfipq"]
+
+[sub_resource type="Resource" id="Resource_22dxn"]
+script = ExtResource("6_vfipq")
+map_id = &"rio"
+
+[resource]
+script = ExtResource("3_i6l21")
+scene = ExtResource("2_vwsev")
+difficulty = 2
+timeline = ExtResource("4_ep44r")
+difficulty_profile = ExtResource("1_yg45l")
+id = &"sao_paulo"
+display_name = "Sao Paulo"
+description = "Arranha-ceus, garoa e transito parado. A horda nunca dorme."
+color = Color(0.6, 0.7, 0.85, 1)
+sort_order = 1
+unlock_requirements = Array[ExtResource("5_gsox4")]([SubResource("Resource_22dxn")])

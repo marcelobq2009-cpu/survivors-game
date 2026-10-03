@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MapData" format=3]
+
+[ext_resource type="Resource" path="res://data/difficulty/default_difficulty.tres" id="1_egnde"]
+[ext_resource type="PackedScene" path="res://game/maps/rio/rio_map.tscn" id="2_47bg6"]
+[ext_resource type="Script" path="res://game/meta/map_data.gd" id="3_60wh6"]
+[ext_resource type="Resource" path="res://data/waves/rio_timeline.tres" id="4_njwrt"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="5_qy6fc"]
+
+[resource]
+script = ExtResource("3_60wh6")
+scene = ExtResource("2_47bg6")
+timeline = ExtResource("4_njwrt")
+difficulty_profile = ExtResource("1_egnde")
+id = &"rio"
+display_name = "Rio de Janeiro"
+description = "Copacabana tomada pelos mortos. Orla, morros e o Cristo observando o caos."
+color = Color(1, 0.65, 0.3, 1)

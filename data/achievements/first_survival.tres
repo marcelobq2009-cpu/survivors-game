@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://game/meta/achievement_data.gd" id="1_u3bn3"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="2_wanku"]
+[ext_resource type="Script" path="res://game/meta/requirements/survive_requirement.gd" id="3_a6ior"]
+
+[sub_resource type="Resource" id="Resource_rq3sj"]
+script = ExtResource("3_a6ior")
+map_id = &"rio"
+seconds = 300.0
+
+[resource]
+script = ExtResource("1_u3bn3")
+id = &"first_survival"
+display_name = "Primeira Sobrevivencia"
+description = "Sobreviva 5 minutos no Rio."
+color = Color(1, 0.82, 0.3, 1)
+unlock_requirements = Array[ExtResource("2_wanku")]([SubResource("Resource_rq3sj")])

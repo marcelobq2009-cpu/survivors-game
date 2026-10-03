@@ -1,45 +1,75 @@
 extends Node
-## Salvamento simples em JSON (autoload "Save").
-## Por enquanto guarda so os recordes. Fica em user://save.json
-## (no navegador, vai para o armazenamento local do site).
+## Save local (autoload "Save"). Guarda o ProfileData em user://save.json
+## (no navegador vai para o armazenamento do site).
+## Seguranca: grava num arquivo temporario e so depois troca (nao corrompe se
+## o jogo fechar no meio), e mantem uma copia .bak da versao anterior.
 
-const PATH := "user://save.json"
+signal profile_changed
 
-var best_time: float = 0.0
-var best_kills: int = 0
+const DEFAULT_PATH := "user://save.json"
+const VERSION := 2
+
+var profile: ProfileData = ProfileData.new()
+var _path: String = DEFAULT_PATH
 
 
 func _ready() -> void:
 	load_data()
 
 
-## Registra o resultado de uma partida; retorna true se bateu algum recorde.
-func submit_run(time: float, kills: int) -> bool:
-	var improved := false
-	if time > best_time:
-		best_time = time
-		improved = true
-	if kills > best_kills:
-		best_kills = kills
-		improved = true
-	if improved:
-		save_data()
-	return improved
+## Troca o arquivo de save (os testes usam um arquivo separado para nao
+## mexer no seu progresso real). Recarrega o perfil do novo arquivo.
+func set_storage_path(path: String) -> void:
+	_path = path
+	load_data()
 
 
 func save_data() -> void:
-	var file := FileAccess.open(PATH, FileAccess.WRITE)
+	var payload := JSON.stringify({"version": VERSION, "profile": profile.to_dict()}, "\t")
+	var file := FileAccess.open(_path + ".tmp", FileAccess.WRITE)
 	if file == null:
-		push_warning("Save: nao foi possivel gravar %s" % PATH)
+		push_warning("Save: nao foi possivel gravar (%s)" % error_string(FileAccess.get_open_error()))
 		return
-	file.store_string(JSON.stringify({"best_time": best_time, "best_kills": best_kills}))
+	file.store_string(payload)
+	file.close()
+	if FileAccess.file_exists(_path):
+		DirAccess.copy_absolute(_path, _path + ".bak")
+	DirAccess.rename_absolute(_path + ".tmp", _path)
+	profile_changed.emit()
 
 
 func load_data() -> void:
-	if not FileAccess.file_exists(PATH):
-		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
-	if parsed is Dictionary:
-		var data: Dictionary = parsed
-		best_time = float(data.get("best_time", 0.0))
-		best_kills = int(data.get("best_kills", 0))
+	var data := _read(_path)
+	if data.is_empty():
+		data = _read(_path + ".bak")  # Arquivo principal ausente/corrompido.
+	profile = _migrate(data)
+	profile_changed.emit()
+
+
+## Apaga todo o progresso (usado pelo debug / "restaurar").
+func reset_progress() -> void:
+	var settings := profile.settings
+	profile = ProfileData.new()
+	profile.settings = settings
+	save_data()
+
+
+func _read(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return parsed if parsed is Dictionary else {}
+
+
+## Converte saves antigos para o formato atual.
+func _migrate(data: Dictionary) -> ProfileData:
+	if data.is_empty():
+		return ProfileData.new()
+	var version := int(data.get("version", 1))
+	if version >= 2:
+		var p: Variant = data.get("profile", {})
+		return ProfileData.from_dict(p if p is Dictionary else {})
+	# Versao 1 (prototipo): so tinha best_time e best_kills.
+	var migrated := ProfileData.new()
+	migrated.total_kills = int(data.get("best_kills", 0))
+	return migrated

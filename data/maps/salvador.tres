@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MapData" format=3]
+
+[ext_resource type="Script" path="res://game/meta/map_data.gd" id="1_8waas"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="2_i84ao"]
+[ext_resource type="Script" path="res://game/meta/requirements/survive_requirement.gd" id="3_ftc8y"]
+
+[sub_resource type="Resource" id="Resource_5nyvu"]
+script = ExtResource("3_ftc8y")
+map_id = &"sao_paulo"
+
+[resource]
+script = ExtResource("1_8waas")
+difficulty = 3
+id = &"salvador"
+display_name = "Salvador"
+description = "Pelourinho em ruinas. Em breve."
+color = Color(0.95, 0.8, 0.3, 1)
+sort_order = 2
+unlock_requirements = Array[ExtResource("2_i84ao")]([SubResource("Resource_5nyvu")])
+coming_soon = true

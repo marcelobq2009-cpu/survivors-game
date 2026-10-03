@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AchievementData" format=3]
+
+[ext_resource type="Script" path="res://game/meta/achievement_data.gd" id="1_vlw24"]
+[ext_resource type="Script" path="res://game/meta/unlock_requirement.gd" id="2_o75de"]
+[ext_resource type="Script" path="res://game/meta/requirements/survive_requirement.gd" id="3_fv72e"]
+
+[sub_resource type="Resource" id="Resource_hjv3x"]
+script = ExtResource("3_fv72e")
+map_id = &"rio"
+
+[resource]
+script = ExtResource("1_vlw24")
+reward_gold = 200
+id = &"rio_survivor"
+display_name = "Sobrevivente do Rio"
+description = "Conclua o Rio de Janeiro no modo normal."
+color = Color(1, 0.82, 0.3, 1)
+sort_order = 4
+unlock_requirements = Array[ExtResource("2_o75de")]([SubResource("Resource_hjv3x")])
