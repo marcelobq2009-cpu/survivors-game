@@ -51,7 +51,8 @@ func _start(setup: RunSetup) -> void:
 	map.build_progress.connect(loading.set_map_progress)
 	map_holder.add_child(map)
 	await map.build_async()
-	await Audio.prepare_for_game(loading.set_audio_progress)
+	var music := &"ranked" if setup.is_ranked() else setup.map.music_id
+	await Audio.prepare_for_game(loading.set_audio_progress, music)
 	var player := PLAYER_SCENE.instantiate() as Player
 	player.character = setup.character
 	add_child(player)
@@ -66,7 +67,7 @@ func _start(setup: RunSetup) -> void:
 	Events.player_died.connect(end_run.bind(false))
 	Events.run_started.emit()
 	Events.xp_changed.emit(0, GameState.progression.xp_needed(), 1)
-	Audio.play_music(&"ranked" if setup.is_ranked() else setup.map.music_id)
+	Audio.play_music(music)
 	started.emit()
 
 

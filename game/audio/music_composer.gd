@@ -9,7 +9,9 @@ extends RefCounted
 ## A composicao e feita aos poucos (await) para nao travar o jogo.
 
 ## Milissegundos de trabalho por frame antes de "respirar" (nao travar a tela).
-const FRAME_BUDGET_MS := 6
+## Milissegundos de composicao por frame (maior na tela de carregamento,
+## pequeno durante a partida para nao travar).
+var frame_budget_ms: int = 6
 
 ## Definicao das trilhas: bpm, compassos e nomes das camadas (em ordem de intensidade).
 const TRACKS: Dictionary = {
@@ -287,6 +289,6 @@ func _hit(buf: PackedFloat32Array, sound: PackedFloat32Array, step_index: int, s
 
 ## Se ja trabalhou demais neste frame, espera o proximo (nao trava a tela).
 func _breathe() -> void:
-	if Time.get_ticks_msec() - _frame_start > FRAME_BUDGET_MS:
+	if Time.get_ticks_msec() - _frame_start > frame_budget_ms:
 		await (Engine.get_main_loop() as SceneTree).process_frame
 		_frame_start = Time.get_ticks_msec()

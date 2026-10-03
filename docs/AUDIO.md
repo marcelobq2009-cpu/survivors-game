@@ -24,7 +24,8 @@ Sons posicionais saem por `<canal>_L` / `<canal>_R` (panner) quando vêm da esqu
 - **Não usar `AudioStreamPlayer3D`**: cada um tocando custava ~20 ms por frame de física no
   Godot 4.7. O som posicional é feito à mão (volume pela distância + lado por bus).
 - Sons gerados ficam em cache em `user://audio_cache/v3/` (troque a versão se mudar uma receita).
-- Música e efeitos da partida são preparados na tela de carregamento (`Audio.prepare_for_game`).
+- Carregamento (`Audio.prepare_for_game`): só efeitos + música do modo escolhido. Chefe, outras
+  trilhas e vinhetas são compostos em segundo plano durante a partida (3 ms por frame).
 
 ## Trocar por arquivos reais
 Nome: `<id>_NN.ogg` (ou `.wav`/`.mp3`), `NN` = variação (01, 02…). Ids em `sound_catalog.gd`.
