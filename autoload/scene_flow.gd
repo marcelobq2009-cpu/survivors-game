@@ -12,6 +12,7 @@ const SETUP := "res://ui/run_setup_screen.tscn"
 const RANKING := "res://ui/ranking_screen.tscn"
 const ACHIEVEMENTS := "res://ui/achievements_screen.tscn"
 const SETTINGS := "res://ui/settings_screen.tscn"
+const UPGRADES := "res://ui/upgrades_screen.tscn"
 const GAME := "res://game/world/world.tscn"
 const FADE_TIME := 0.18
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_build_rotate_hint()
 	get_viewport().size_changed.connect(_update_rotate_hint)
 	_update_rotate_hint()
+	GraphicsSettings.apply(get_tree(), Save.profile.settings)
 
 
 func go_to(path: String, p_params: Dictionary = {}) -> void:
@@ -39,6 +41,7 @@ func go_to(path: String, p_params: Dictionary = {}) -> void:
 		return
 	_busy = true
 	params = p_params
+	Audio.play(&"ui_transition")
 	_fade.mouse_filter = Control.MOUSE_FILTER_STOP
 	var tw := create_tween()
 	tw.tween_property(_fade, "color:a", 1.0, FADE_TIME)

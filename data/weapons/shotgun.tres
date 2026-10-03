@@ -19,4 +19,4 @@ lifetime = 0.45
 target_range = 8.0
 knockback = 6.0
 projectile_visual = 1
-sound_id = &"shotgun"
+sound_id = &"weapon_shotgun_fire"

@@ -14,6 +14,7 @@ config/name="Apocalipse Brasil"
 config/description="Survivor-like de apocalipse zumbi no Brasil (3D isometrico, mobile)."
 config/version="0.2.0"
 run/main_scene="res://ui/main_menu.tscn"
+config/icon="res://assets/icon.png"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
@@ -104,3 +105,10 @@ renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.09, 0.09, 0.12, 1)
+
+[shader_globals]
+
+player_world_pos={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}

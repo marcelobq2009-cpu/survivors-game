@@ -30,7 +30,7 @@ func setup(p_content: ContentData, p_unlocked: bool) -> void:
 	selected.bg_color = Color(0.12, 0.14, 0.1, 0.95)
 	add_theme_stylebox_override(&"pressed", selected)
 	add_theme_stylebox_override(&"hover_pressed", selected)
-	UiKit.add_press_feedback(self)
+	UiKit.add_press_feedback(self, &"ui_select")
 
 	var box := UiKit.vbox(8)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE

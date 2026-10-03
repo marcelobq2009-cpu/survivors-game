@@ -87,6 +87,15 @@ func nearest_pickup(pos: Vector2, max_dist: float) -> Vector2:
 	return best
 
 
+## Posicoes dos baus no chao (setas verdes no HUD).
+func chest_positions() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for p: Pickup in _items:
+		if p.kind == Kind.CHEST:
+			out.append(p.pos)
+	return out
+
+
 ## Puxa todas as gemas e moedas para o jogador (ima total / debug).
 func vacuum_all() -> void:
 	for p: Pickup in _items:
@@ -141,15 +150,12 @@ func _collect(p: Pickup) -> void:
 		Kind.GEM:
 			_gem_count -= 1
 			Events.xp_collected.emit(p.value)
-			Audio.play(&"pickup_xp", -14.0)
 		Kind.COIN:
 			Events.gold_collected.emit(maxi(1, roundi(p.value * GameState.gold_mult)))
-			Audio.play(&"pickup_gold", -10.0)
 		Kind.CHEST:
 			Events.gold_collected.emit(maxi(1, roundi(p.value * GameState.gold_mult)))
 			Events.chest_opened.emit()
 			Events.player_healed.emit(CHEST_HEAL)
-			Audio.play(&"chest", -4.0)
 
 
 func _process(_delta: float) -> void:

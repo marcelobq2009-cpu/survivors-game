@@ -37,6 +37,12 @@ extends Resource
 @export var horde_size: int = 30
 @export var horde_size_growth_per_min: float = 2.0
 
+@export_group("Eventos especiais")
+## Um evento (queda de suprimentos ou area contaminada) a cada X segundos.
+@export var event_interval: float = 95.0
+## Area contaminada so aparece depois deste tempo.
+@export var toxic_from: float = 180.0
+
 @export_group("Depois do fim da timeline (ranqueado)")
 ## Acelera tudo depois que acabam as ondas definidas (ranqueado infinito).
 @export var overtime_growth_mult: float = 1.5

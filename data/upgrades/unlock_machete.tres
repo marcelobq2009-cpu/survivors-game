@@ -9,6 +9,7 @@ id = &"unlock_machete"
 title = "Nova arma: Facão"
 description = "Golpe em arco na sua frente."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_lh75j")
 max_picks = 1
 weight = 1.2

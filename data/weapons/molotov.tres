@@ -17,4 +17,6 @@ lifetime = 0.7
 target_range = 13.0
 knockback = 4.0
 projectile_visual = 2
-sound_id = &"throw"
+sound_id = &"weapon_molotov_throw"
+impact_sound_id = &"weapon_molotov_burst"
+fire_duration = 2.5

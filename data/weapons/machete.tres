@@ -15,4 +15,4 @@ cooldown = 0.9
 area = 2.2
 knockback = 5.0
 uses_projectile_bonus = false
-sound_id = &"melee"
+sound_id = &"weapon_machete_swing"

@@ -14,4 +14,4 @@ func attack() -> void:
 	for i: int in final_count():
 		var jitter := Vector2(_rng.randf_range(-1, 1), _rng.randf_range(-1, 1)) * 2.0 * i
 		projectiles.spawn_thrown(self, from, nearest.pos + jitter)
-	Audio.play(data.sound_id, -6.0)
+	Audio.play(data.sound_id)

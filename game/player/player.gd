@@ -13,6 +13,8 @@ var stats: PlayerStats
 var health: Health
 var weapons: Dictionary[StringName, Weapon] = {}
 var facing: Vector2 = Vector2(0, 1)
+## Quem causou o ultimo dano (tela de resultado: "causa da morte").
+var last_damage_source: String = ""
 
 var _model: Node3D
 var _rig: CameraRig
@@ -40,6 +42,8 @@ func _ready() -> void:
 	stats = PlayerStats.from_character(character)
 	for u: UpgradeData in character.passive_bonuses:
 		stats.apply(u.stat, u.value, u.is_multiplier)
+	# Melhorias permanentes compradas com ouro.
+	MetaShop.apply(Save.profile, Content.meta_upgrades, stats)
 	health = Health.new(stats.max_health, character.invincibility_time)
 	health.armor = stats.armor
 	health.regen = stats.regen
@@ -64,6 +68,22 @@ func _build_model() -> void:
 		mi.mesh = PlaceholderMeshes.human(character.color)
 		_model = mi
 	model_root.add_child(_model)
+	# Anel no chao na cor do personagem: facil de achar no meio da horda.
+	var ring := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.55
+	torus.outer_radius = 0.68
+	torus.rings = 24
+	torus.ring_segments = 4
+	ring.mesh = torus
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ring_mat.albedo_color = character.color.lightened(0.3)
+	ring.material_override = ring_mat
+	ring.scale = Vector3(1, 0.15, 1)
+	ring.position.y = 0.05
+	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(ring)
 
 
 func _physics_process(delta: float) -> void:
@@ -128,17 +148,18 @@ func teleport(pos: Vector2) -> void:
 
 
 func _sync_state() -> void:
+	RenderingServer.global_shader_parameter_set(&"player_world_pos", global_position)
 	GameState.player_position = GroundPlane.to_2d(global_position)
 	GameState.pickup_radius = stats.pickup_radius
 	GameState.xp_mult = stats.xp_mult
 	GameState.gold_mult = stats.gold_mult
 
 
-func _on_player_contact(damage: float) -> void:
+func _on_player_contact(damage: float, source: String) -> void:
 	var applied := health.take_damage(damage)
 	if applied <= 0.0:
 		return
-	Audio.play(&"player_hurt")
+	last_damage_source = source
 	Audio.vibrate(40)
 	Events.player_damaged.emit(applied)
 	Events.camera_shake_requested.emit(6.0)

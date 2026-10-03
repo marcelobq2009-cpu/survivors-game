@@ -28,6 +28,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	Engine.max_fps = 0
+	if not _world.has_started:
+		return
 	_frames += 1
 	if _frames == 3:
 		GameState.elapsed = START_TIME

@@ -29,6 +29,7 @@ func _ready() -> void:
 	root.add_child(header)
 	if _title_text != "":
 		var back := UiKit.button("‹ Voltar", Vector2(170, 64), 24)
+		back.pressed.connect(func() -> void: Audio.play(&"ui_back"))
 		back.pressed.connect(go_back)
 		header.add_child(back)
 		title_label = UiKit.label(_title_text.to_upper(), 40, UiKit.TEXT)

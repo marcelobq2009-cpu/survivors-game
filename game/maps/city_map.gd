@@ -15,6 +15,7 @@ const HOUSE_COLORS: Array[Color] = [
 	Color(0.9, 0.55, 0.6), Color(0.95, 0.95, 0.9), Color(0.5, 0.75, 0.45), Color(0.7, 0.45, 0.3),
 ]
 const GLASS := Color(0.12, 0.14, 0.18)
+const BUILDING_SHADER: Shader = preload("res://game/maps/building.gdshader")
 
 @export var layout: CityLayout
 
@@ -29,7 +30,7 @@ var _obstacles: StaticBody3D
 var _city_max_z: float = 0.0
 
 
-func build() -> void:
+func build_async() -> void:
 	if layout == null:
 		layout = CityLayout.new()
 	_rng.seed = layout.seed
@@ -46,17 +47,45 @@ func build() -> void:
 	_city_max_z = he.y - (layout.beach_depth if layout.beach_south else 0.0)
 
 	_build_ground()
-	_build_blocks()
+	await _step(0.05, "Asfalto e calçadas")
+	var centers := _block_centers()
+	for i: int in centers.size():
+		_build_block(centers[i])
+		if i % 4 == 3:
+			await _step(0.05 + 0.55 * float(i) / centers.size(), "Prédios e caixas d'água")
 	_build_streets()
+	_build_street_life(centers)
+	await _step(0.65, "Ruas, orelhões e bancas")
 	if layout.beach_south:
 		_build_beach()
+		await _step(0.75, "Orla de Copacabana")
 	if layout.morro_north:
 		_build_morro()
+		await _step(0.85, "Morro e comunidade")
 	if layout.sugarloaf:
 		_build_sugarloaf()
+	_build_landmark_signs()
 	_build_walls()
 	_commit()
+	await _step(0.97, "Últimos detalhes")
 	player_spawn = grid.nearest_free(Vector2(0, 0))
+	is_built = true
+	build_progress.emit(1.0, "Pronto")
+
+
+## Avisa o progresso e deixa um frame passar (a tela de carregamento anima).
+func _step(ratio: float, label: String) -> void:
+	build_progress.emit(ratio, label)
+	await get_tree().process_frame
+
+
+## Regiao do mapa num ponto (audio de ambiente, avisos): beach, hills ou city.
+func region_at(p: Vector2) -> StringName:
+	if layout.beach_south and p.y > _city_max_z:
+		return &"beach"
+	if layout.morro_north and p.y < -layout.half_extents.y + 28.0:
+		return &"hills"
+	return &"city"
 
 
 # --- Chao ---------------------------------------------------------------------
@@ -93,24 +122,23 @@ func _block_centers() -> Array[Vector2]:
 
 # --- Quarteiroes e predios ------------------------------------------------------
 
-func _build_blocks() -> void:
-	for c: Vector2 in _block_centers():
-		var bs := layout.block_size
-		PlaceholderMeshes.add_box(_ground, Vector3(bs, 0.15, bs), Vector3(c.x, 0.075, c.y),
-				layout.sidewalk_color)
-		if _rng.randf() < layout.plaza_ratio:
-			_build_plaza(c)
-		else:
-			_build_lots(c)
-		for i: int in roundi(layout.rubble_per_block * _rng.randf_range(0.0, 2.0)):
-			var p := c + Vector2(_rng.randf_range(-1, 1), _rng.randf_range(-1, 1)).normalized() \
-					* (bs * 0.5 + _rng.randf_range(0.5, 2.5))
-			_add_prop("rubble", p, _rng.randf() * TAU, 1.0, Vector2(1.6, 1.4))
-		# Postes nos cantos da calcada.
-		for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-			if _rng.randf() < 0.6:
-				_add_prop("lamp", c + corner * (bs * 0.5 - 0.6), PI * 0.25 * corner.x, 1.0,
-						Vector2.ZERO)
+func _build_block(c: Vector2) -> void:
+	var bs := layout.block_size
+	PlaceholderMeshes.add_box(_ground, Vector3(bs, 0.15, bs), Vector3(c.x, 0.075, c.y),
+			layout.sidewalk_color)
+	if _rng.randf() < layout.plaza_ratio:
+		_build_plaza(c)
+	else:
+		_build_lots(c)
+	for i: int in roundi(layout.rubble_per_block * _rng.randf_range(0.0, 2.0)):
+		var p := c + Vector2(_rng.randf_range(-1, 1), _rng.randf_range(-1, 1)).normalized() \
+				* (bs * 0.5 + _rng.randf_range(0.5, 2.5))
+		_add_prop("rubble", p, _rng.randf() * TAU, 1.0, Vector2(1.6, 1.4))
+	# Postes nos cantos da calcada.
+	for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+		if _rng.randf() < 0.6:
+			_add_prop("lamp", c + corner * (bs * 0.5 - 0.6), PI * 0.25 * corner.x, 1.0,
+					Vector2.ZERO)
 
 
 func _build_plaza(c: Vector2) -> void:
@@ -291,6 +319,7 @@ func _build_beach() -> void:
 		_add_prop("palm", Vector2(x + _rng.randf_range(-1, 1), calcadao_z + calcadao_w - 1.0),
 				_rng.randf() * TAU, _rng.randf_range(0.9, 1.15), Vector2(0.7, 0.7))
 		x += 9.0
+	_build_beach_life(sand_z0, calcadao_z)
 	x = -he.x + 20.0
 	while x < he.x - 10.0:
 		var kp := Vector2(x, sand_z0 + 8.0)
@@ -420,20 +449,25 @@ func _prop_mesh(kind: String) -> Mesh:
 func _commit() -> void:
 	_add_mesh("Ground", PlaceholderMeshes.finish(_ground), false)
 	_add_mesh("Scenery", PlaceholderMeshes.finish(_scenery), false)
+	# Predios usam o shader com "buraco de visao" (o jogador nunca some atras deles).
+	var building_mat := ShaderMaterial.new()
+	building_mat.shader = BUILDING_SHADER
 	for key: Vector2i in _chunks:
-		_add_mesh("Buildings_%d_%d" % [key.x, key.y], PlaceholderMeshes.finish(_chunks[key]), true)
+		var mi := _add_mesh("Buildings_%d_%d" % [key.x, key.y], PlaceholderMeshes.finish(_chunks[key]), true)
+		mi.material_override = building_mat
 	for kind: String in _props:
 		_add_multimesh(kind, _prop_mesh(kind), _props[kind], [])
 	_add_multimesh("Cars", PlaceholderMeshes.car(Color.WHITE), _cars, _car_colors)
 
 
-func _add_mesh(node_name: String, mesh: Mesh, shadows: bool) -> void:
+func _add_mesh(node_name: String, mesh: Mesh, shadows: bool) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	mi.name = node_name
 	mi.mesh = mesh
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadows \
 			else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mi)
+	return mi
 
 
 func _add_multimesh(node_name: String, mesh: Mesh, xforms: Array[Transform3D], colors: Array[Color]) -> void:
@@ -452,3 +486,106 @@ func _add_multimesh(node_name: String, mesh: Mesh, xforms: Array[Transform3D], c
 	mmi.name = node_name
 	mmi.multimesh = mm
 	add_child(mmi)
+
+
+# --- Identidade carioca: orla, rua e pontos turisticos -----------------------------
+
+const UMBRELLA_COLORS: Array[Color] = [Color(0.95, 0.3, 0.25), Color(1.0, 0.85, 0.2),
+	Color(0.2, 0.6, 0.95), Color(0.25, 0.75, 0.4), Color(1.0, 0.55, 0.15)]
+
+
+## Guarda-sois, cadeiras, postos salva-vidas numerados e o letreiro COPACABANA.
+func _build_beach_life(sand_z0: float, calcadao_z: float) -> void:
+	var he := layout.half_extents
+	var x := -he.x + 10.0
+	while x < he.x - 8.0:
+		var p := Vector2(x + _rng.randf_range(-3, 3), sand_z0 + _rng.randf_range(14.0, 24.0))
+		if p.y < he.y - 1.0 and grid.is_free(p):
+			var col: Color = UMBRELLA_COLORS[_rng.randi_range(0, UMBRELLA_COLORS.size() - 1)]
+			var cst := _chunk_tool(p)
+			PlaceholderMeshes.add_box(cst, Vector3(0.08, 2.2, 0.08), GroundPlane.to_3d(p, 1.1), Color(0.9, 0.9, 0.9))
+			PlaceholderMeshes.add_sphere(cst, 1.3, GroundPlane.to_3d(p, 2.2), col, Vector3(1, 0.28, 1), 10)
+			PlaceholderMeshes.add_box(cst, Vector3(0.6, 0.12, 1.4), GroundPlane.to_3d(p + Vector2(0.9, 0.3), 0.3),
+					col.lightened(0.3), 0.2)
+		x += _rng.randf_range(6.0, 11.0)
+	# Postos salva-vidas (Posto 4, 5, 6...) com placa.
+	var posto := 4
+	x = -he.x + 30.0
+	while x < he.x - 20.0:
+		var p2 := Vector2(x, sand_z0 + 6.0)
+		var pst := _chunk_tool(p2)
+		PlaceholderMeshes.add_box(pst, Vector3(3.2, 3.0, 3.2), GroundPlane.to_3d(p2, 1.5), Color(0.95, 0.95, 0.92))
+		PlaceholderMeshes.add_box(pst, Vector3(3.6, 0.3, 3.6), GroundPlane.to_3d(p2, 3.15), Color(0.2, 0.45, 0.85))
+		_add_collision(p2, Vector3(3.2, 3.0, 3.2), 0.0)
+		grid.block_rect(p2, Vector2(3.2, 3.2), 0.0, 0.05)
+		_add_sign("POSTO %d" % posto, GroundPlane.to_3d(p2, 4.3), 28, Color(0.95, 0.25, 0.2))
+		posto += 1
+		x += 55.0
+	_add_sign("COPACABANA", Vector3(0, 0.6, calcadao_z + 3.5), 140, Color(1.0, 0.85, 0.3))
+	_add_sign("AV. ATLÂNTICA", Vector3(-he.x * 0.5, 2.5, calcadao_z - 2.0), 36, Color(0.3, 0.55, 0.95))
+
+
+## Orelhoes, bancas de jornal, pontos de onibus e placas de rua nas calcadas.
+func _build_street_life(centers: Array[Vector2]) -> void:
+	var names: PackedStringArray = ["R. BARATA RIBEIRO", "R. SANTA CLARA", "R. FIGUEIREDO MAGALHÃES",
+		"R. TONELERO", "R. SIQUEIRA CAMPOS", "R. HILÁRIO DE GOUVEIA"]
+	var n := 0
+	for i: int in centers.size():
+		var c := centers[i]
+		var half := layout.block_size * 0.5
+		var r := _rng.randf()
+		var side := Vector2(half - 0.9, _rng.randf_range(-half * 0.6, half * 0.6))
+		if _rng.randf() < 0.5:
+			side = Vector2(_rng.randf_range(-half * 0.6, half * 0.6), half - 0.9)
+		var p := c + side
+		var st := _chunk_tool(p)
+		if r < 0.22:
+			# Orelhao (cabine telefonica laranja, bem brasileira).
+			PlaceholderMeshes.add_box(st, Vector3(0.12, 1.6, 0.12), GroundPlane.to_3d(p, 0.8), Color(0.3, 0.3, 0.3))
+			PlaceholderMeshes.add_sphere(st, 0.6, GroundPlane.to_3d(p, 1.9), Color(1.0, 0.5, 0.1), Vector3(1, 0.9, 0.8), 10)
+		elif r < 0.38:
+			# Banca de jornal.
+			PlaceholderMeshes.add_box(st, Vector3(2.4, 2.2, 1.6), GroundPlane.to_3d(p, 1.1), Color(0.15, 0.45, 0.3))
+			PlaceholderMeshes.add_box(st, Vector3(2.8, 0.15, 2.0), GroundPlane.to_3d(p, 2.3), Color(0.85, 0.85, 0.8))
+			_add_collision(p, Vector3(2.4, 2.2, 1.6), 0.0)
+			grid.block_rect(p, Vector2(2.4, 1.6), 0.0, 0.05)
+		elif r < 0.52:
+			# Ponto de onibus (banco + cobertura).
+			PlaceholderMeshes.add_box(st, Vector3(2.6, 0.12, 1.2), GroundPlane.to_3d(p, 2.4), Color(0.25, 0.3, 0.35))
+			PlaceholderMeshes.add_box(st, Vector3(0.08, 2.4, 0.08), GroundPlane.to_3d(p + Vector2(1.2, 0), 1.2), Color(0.3, 0.3, 0.3))
+			PlaceholderMeshes.add_box(st, Vector3(0.08, 2.4, 0.08), GroundPlane.to_3d(p - Vector2(1.2, 0), 1.2), Color(0.3, 0.3, 0.3))
+			PlaceholderMeshes.add_box(st, Vector3(2.2, 0.1, 0.5), GroundPlane.to_3d(p, 0.5), Color(0.5, 0.35, 0.2))
+		if i % 7 == 3 and n < names.size():
+			_add_sign(names[n], GroundPlane.to_3d(c + Vector2(-half + 0.5, -half + 0.5), 3.2), 26,
+					Color(0.3, 0.55, 0.95))
+			n += 1
+
+
+## Entrada de tunel no pe do morro e placas dos pontos turisticos.
+func _build_landmark_signs() -> void:
+	var he := layout.half_extents
+	if layout.morro_north:
+		var tp := Vector2(he.x * 0.35, -he.y - 3.0)
+		PlaceholderMeshes.add_box(_scenery, Vector3(12, 8, 4), GroundPlane.to_3d(tp, 4.0), Color(0.45, 0.43, 0.4))
+		PlaceholderMeshes.add_box(_scenery, Vector3(8, 5.5, 4.2), GroundPlane.to_3d(tp + Vector2(0, 0.1), 2.75),
+				Color(0.05, 0.05, 0.06))
+		_add_sign("TÚNEL NOVO", GroundPlane.to_3d(tp + Vector2(0, 2.2), 8.6), 36, Color(1.0, 0.85, 0.3))
+	if layout.cristo:
+		_add_sign("CRISTO REDENTOR", Vector3(-20, 30, -he.y - 60.0), 90, Color(0.95, 0.95, 0.9))
+	if layout.sugarloaf:
+		_add_sign("PÃO DE AÇÚCAR", Vector3(he.x * 0.55, 18, he.y + 60.0), 90, Color(0.95, 0.95, 0.9))
+
+
+func _add_sign(text: String, pos: Vector3, size: int, color: Color) -> void:
+	var l := Label3D.new()
+	l.text = text
+	l.position = pos
+	l.font_size = size
+	l.pixel_size = 0.02
+	l.modulate = color
+	l.outline_size = 10
+	l.outline_modulate = Color(0, 0, 0, 0.85)
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.shaded = false
+	l.double_sided = true
+	add_child(l)

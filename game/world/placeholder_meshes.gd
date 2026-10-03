@@ -118,6 +118,76 @@ static func zombie(body: Color, skin: Color) -> Mesh:
 		return _finish(st))
 
 
+## Modelo de zumbi por tipo (silhueta diferente = leitura rapida da ameaca).
+static func zombie_kind(kind: int, body: Color, skin: Color) -> Mesh:
+	match kind:
+		EnemyData.ModelKind.RUNNER:
+			return _cached("runner_%s" % body.to_html(), func() -> Mesh:
+				var st := _begin()
+				var pants := body.darkened(0.5)
+				_box(st, Vector3(0.14, 0.85, 0.16), Vector3(-0.1, 0.42, -0.05), pants, 0.0, 0.25)
+				_box(st, Vector3(0.14, 0.85, 0.16), Vector3(0.1, 0.42, 0.1), pants, 0.0, -0.3)
+				_box(st, Vector3(0.36, 0.55, 0.22), Vector3(0.0, 1.0, 0.18), body, 0.0, 0.55)
+				_sphere(st, 0.14, Vector3(0.0, 1.25, 0.48), skin)
+				_box(st, Vector3(0.09, 0.09, 0.75), Vector3(-0.2, 0.95, 0.5), skin, 0.2, 0.3)
+				_box(st, Vector3(0.09, 0.09, 0.75), Vector3(0.2, 0.9, 0.48), skin, -0.2, 0.35)
+				return _finish(st))
+		EnemyData.ModelKind.BRUTE:
+			return _cached("brute_%s" % body.to_html(), func() -> Mesh:
+				var st := _begin()
+				var pants := body.darkened(0.4)
+				_box(st, Vector3(0.26, 0.7, 0.28), Vector3(-0.2, 0.35, 0.0), pants)
+				_box(st, Vector3(0.26, 0.7, 0.28), Vector3(0.2, 0.35, 0.0), pants)
+				_box(st, Vector3(0.8, 0.75, 0.45), Vector3(0.0, 1.08, 0.0), body, 0.0, 0.2)
+				_sphere(st, 0.16, Vector3(0.0, 1.52, 0.18), skin)
+				_box(st, Vector3(0.22, 0.75, 0.24), Vector3(-0.52, 0.95, 0.15), skin, 0.0, -0.4)
+				_box(st, Vector3(0.22, 0.75, 0.24), Vector3(0.52, 0.95, 0.15), skin, 0.0, -0.4)
+				_sphere(st, 0.17, Vector3(-0.55, 0.62, 0.38), skin.darkened(0.2))
+				_sphere(st, 0.17, Vector3(0.55, 0.62, 0.38), skin.darkened(0.2))
+				return _finish(st))
+		EnemyData.ModelKind.BLOATER:
+			return _cached("bloater_%s" % body.to_html(), func() -> Mesh:
+				var st := _begin()
+				_box(st, Vector3(0.18, 0.6, 0.2), Vector3(-0.16, 0.3, 0.0), body.darkened(0.4))
+				_box(st, Vector3(0.18, 0.6, 0.2), Vector3(0.16, 0.3, 0.0), body.darkened(0.4))
+				_sphere(st, 0.52, Vector3(0.0, 1.0, 0.08), skin, Vector3(1.0, 0.9, 1.05), 12)
+				_sphere(st, 0.15, Vector3(0.0, 1.55, 0.05), skin.darkened(0.15))
+				var glow := Color(1.0, 0.85, 0.25)
+				for p: Vector3 in [Vector3(0.3, 1.2, 0.4), Vector3(-0.35, 0.9, 0.35), Vector3(0.1, 0.75, 0.52), Vector3(-0.1, 1.35, 0.42)]:
+					_sphere(st, 0.09, p, glow, Vector3.ONE, 6)
+				_box(st, Vector3(0.1, 0.1, 0.4), Vector3(-0.42, 1.1, 0.2), skin)
+				_box(st, Vector3(0.1, 0.1, 0.4), Vector3(0.42, 1.1, 0.2), skin)
+				return _finish(st))
+		EnemyData.ModelKind.COLOSSUS:
+			return _cached("colossus_%s" % body.to_html(), func() -> Mesh:
+				var st := _begin()
+				var rock := Color(0.45, 0.42, 0.38)
+				_box(st, Vector3(0.3, 0.75, 0.3), Vector3(-0.22, 0.37, 0.0), body.darkened(0.4))
+				_box(st, Vector3(0.3, 0.75, 0.3), Vector3(0.22, 0.37, 0.0), body.darkened(0.4))
+				_box(st, Vector3(0.9, 0.8, 0.5), Vector3(0.0, 1.1, 0.05), body, 0.0, 0.25)
+				_box(st, Vector3(0.45, 0.25, 0.5), Vector3(-0.55, 1.5, 0.0), rock, 0.3)
+				_box(st, Vector3(0.45, 0.25, 0.5), Vector3(0.55, 1.5, 0.0), rock, -0.3)
+				_sphere(st, 0.15, Vector3(0.0, 1.55, 0.3), skin)
+				_box(st, Vector3(0.26, 0.9, 0.28), Vector3(-0.62, 0.95, 0.2), skin, 0.0, -0.5)
+				_box(st, Vector3(0.26, 0.9, 0.28), Vector3(0.62, 0.95, 0.2), skin, 0.0, -0.5)
+				return _finish(st))
+		EnemyData.ModelKind.MUTANT:
+			return _cached("mutant_%s" % body.to_html(), func() -> Mesh:
+				var st := _begin()
+				var spike := Color(0.85, 0.85, 0.7)
+				_box(st, Vector3(0.14, 1.0, 0.16), Vector3(-0.14, 0.5, 0.0), body.darkened(0.4))
+				_box(st, Vector3(0.14, 1.0, 0.16), Vector3(0.14, 0.5, 0.0), body.darkened(0.4))
+				_box(st, Vector3(0.45, 0.8, 0.28), Vector3(0.0, 1.38, 0.0), body)
+				_sphere(st, 0.15, Vector3(0.0, 1.95, 0.08), skin)
+				for side: float in [-1.0, 1.0]:
+					_box(st, Vector3(0.09, 0.09, 0.8), Vector3(0.3 * side, 1.6, 0.35), skin, 0.15 * side)
+					_box(st, Vector3(0.08, 0.08, 0.6), Vector3(0.3 * side, 1.15, 0.3), skin.darkened(0.2), -0.2 * side)
+				for i: int in 4:
+					_box(st, Vector3(0.06, 0.28, 0.06), Vector3(0.0, 1.55 + i * 0.12, -0.17), spike, 0.0, -0.6)
+				return _finish(st))
+	return zombie(body, skin)
+
+
 ## Pessoa (sobrevivente): bracos ao lado do corpo e mochila nas costas.
 static func human(shirt: Color, pants: Color = Color(0.2, 0.22, 0.3),
 		skin: Color = Color(0.78, 0.58, 0.42), pack: Color = Color(0.35, 0.28, 0.2)) -> Mesh:

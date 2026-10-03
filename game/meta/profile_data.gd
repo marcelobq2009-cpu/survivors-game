@@ -23,6 +23,8 @@ var achievements: Array[String] = []
 var tutorial_done: bool = false
 var last_character_id: String = ""
 var last_map_id: String = ""
+## Melhorias permanentes compradas: id -> nivel.
+var meta_levels: Dictionary = {}
 var settings: GameSettings = GameSettings.new()
 
 
@@ -34,7 +36,7 @@ func to_dict() -> Dictionary:
 		"best_time_by_map": best_time_by_map, "best_ranked_time": best_ranked_time,
 		"best_ranked_score": best_ranked_score, "completed_maps": completed_maps,
 		"unlocked": unlocked, "achievements": achievements, "tutorial_done": tutorial_done,
-		"last_character_id": last_character_id, "last_map_id": last_map_id,
+		"last_character_id": last_character_id, "last_map_id": last_map_id, "meta_levels": meta_levels,
 		"settings": settings.to_dict(),
 	}
 
@@ -57,6 +59,7 @@ static func from_dict(d: Dictionary) -> ProfileData:
 	p.tutorial_done = bool(d.get("tutorial_done", false))
 	p.last_character_id = str(d.get("last_character_id", ""))
 	p.last_map_id = str(d.get("last_map_id", ""))
+	p.meta_levels = _dict(d, "meta_levels")
 	var s: Variant = d.get("settings", {})
 	p.settings = GameSettings.from_dict(s if s is Dictionary else {})
 	return p

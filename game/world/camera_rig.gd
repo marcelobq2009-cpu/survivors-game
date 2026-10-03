@@ -17,6 +17,7 @@ const GROUP := &"camera_rig"
 @export var distance: float = 60.0
 ## Zoom = altura visivel em metros (camera ortogonal). Maior = ve mais cidade.
 @export var default_zoom: float = 17.0
+const BASE_ZOOM := 17.0
 @export var min_zoom: float = 12.0
 @export var max_zoom: float = 40.0
 ## Suavidade do seguimento (maior = segue mais rapido).
@@ -41,6 +42,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	default_zoom = BASE_ZOOM * Save.profile.settings.camera_zoom
 	camera.size = default_zoom
 	camera.near = 1.0
 	camera.far = 400.0
@@ -52,6 +54,14 @@ func _ready() -> void:
 
 static func find(tree: SceneTree) -> CameraRig:
 	return tree.get_first_node_in_group(GROUP) as CameraRig
+
+
+## Zoom das Configuracoes (1 = padrao).
+func apply_zoom_setting(mult: float) -> void:
+	default_zoom = BASE_ZOOM * mult
+	if camera == null:
+		return  # ainda nao entrou na cena; _ready usa default_zoom
+	zoom_to(default_zoom, 0.3)
 
 
 func shake(strength: float) -> void:

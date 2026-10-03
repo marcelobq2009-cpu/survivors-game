@@ -9,6 +9,7 @@ id = &"unlock_shotgun"
 title = "Nova arma: Espingarda"
 description = "Leque de chumbo a curta distancia."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_bg45o")
 max_picks = 1
 weight = 1.2

@@ -18,7 +18,8 @@ func _ready() -> void:
 	safe.add_child(row)
 	row.add_child(_build_title())
 	row.add_child(_build_buttons())
-	Audio.play_music(&"music_menu")
+	Audio.play_music(&"menu")
+	Audio.set_intensity(2)
 
 
 func _build_title() -> Control:
@@ -38,7 +39,7 @@ func _build_title() -> Control:
 	info.add_child(UiKit.label("Recorde  %s" % UiKit.time_text(best), 24, UiKit.TEXT))
 	info.add_child(UiKit.label("Abates  %d" % p.total_kills, 24, UiKit.MUTED))
 	col.add_child(info)
-	col.add_child(UiKit.label(version_text(), 18, UiKit.MUTED))
+	col.add_child(_version_label())
 	return col
 
 
@@ -70,9 +71,16 @@ func _build_buttons() -> Control:
 		b.pressed.connect(it[1] as Callable)
 		grid.add_child(b)
 	col.add_child(grid)
-	var settings := UiKit.button("CONFIGURAÇÕES", Vector2(0, UiKit.TOUCH_HEIGHT), 22)
+	var bottom := UiKit.hbox(14)
+	var shop := UiKit.button("MELHORIAS", Vector2(228, UiKit.TOUCH_HEIGHT), 22, UiKit.GOLD)
+	shop.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	shop.pressed.connect(func() -> void: SceneFlow.go_to(SceneFlow.UPGRADES))
+	bottom.add_child(shop)
+	var settings := UiKit.button("CONFIGURAÇÕES", Vector2(228, UiKit.TOUCH_HEIGHT), 22)
+	settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	settings.pressed.connect(func() -> void: SceneFlow.go_to(SceneFlow.SETTINGS))
-	col.add_child(settings)
+	bottom.add_child(settings)
+	col.add_child(bottom)
 	col.add_child(UiKit.spacer(false, true))
 	return col
 
@@ -85,3 +93,27 @@ static func version_text() -> String:
 		if info and info.get_script_constant_map().has("COMMIT"):
 			commit = str(info.get_script_constant_map()["COMMIT"])
 	return "v%s (%s)" % [version, commit]
+
+
+## Versao no rodape. Codigo secreto: 7 toques rapidos liga/desliga o modo de
+## teste (ferramentas de debug) na versao publicada.
+func _version_label() -> Label:
+	var l := UiKit.label(version_text(), 18, UiKit.MUTED)
+	l.mouse_filter = Control.MOUSE_FILTER_STOP
+	var taps := [0, 0]  # [quantidade, ultimo toque ms]
+	l.gui_input.connect(func(e: InputEvent) -> void:
+		var pressed := (e is InputEventMouseButton and (e as InputEventMouseButton).pressed) \
+				or (e is InputEventScreenTouch and (e as InputEventScreenTouch).pressed)
+		if not pressed:
+			return
+		var now := Time.get_ticks_msec()
+		taps[0] = int(taps[0]) + 1 if now - int(taps[1]) < 700 else 1
+		taps[1] = now
+		if int(taps[0]) >= 7:
+			taps[0] = 0
+			var s := Save.profile.settings
+			s.debug_unlocked = not s.debug_unlocked
+			Save.save_data()
+			Audio.play(&"ui_select")
+			l.text = version_text() + ("   [MODO DE TESTE ATIVADO]" if s.debug_unlocked else "   [modo de teste desligado]"))
+	return l

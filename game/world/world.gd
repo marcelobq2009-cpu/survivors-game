@@ -9,6 +9,10 @@ const PLAYER_SCENE: PackedScene = preload("res://game/player/player.tscn")
 const END_DELAY := 1.4  # segundos de "camera lenta" antes do resultado
 const GROUP := &"world"
 
+## Emitido quando o mapa terminou de carregar e a partida comecou.
+signal started
+
+var has_started: bool = false
 var _duration: float = 0.0
 var _last_minute_warned: bool = false
 var _ending: bool = false
@@ -36,8 +40,18 @@ func _ready() -> void:
 	if not Config.game.debug_tools_enabled():
 		$DebugPanel.queue_free()
 
+	_start.call_deferred(setup)
+
+
+## Carrega o mapa (com tela de carregamento) e so entao comeca a partida.
+func _start(setup: RunSetup) -> void:
+	var loading := LoadingScreen.new()
+	add_child(loading)
 	var map := setup.map.scene.instantiate() as GameMap
+	map.build_progress.connect(loading.set_map_progress)
 	map_holder.add_child(map)
+	await map.build_async()
+	await Audio.prepare_for_game(loading.set_audio_progress)
 	var player := PLAYER_SCENE.instantiate() as Player
 	player.character = setup.character
 	add_child(player)
@@ -46,11 +60,14 @@ func _ready() -> void:
 	spawner.setup(setup.map.timeline, setup.map.difficulty_profile, enemies)
 	GraphicsSettings.apply(get_tree(), Save.profile.settings)
 	_duration = setup.duration()
+	await loading.finish()
 	GameState.is_running = true
+	has_started = true
 	Events.player_died.connect(end_run.bind(false))
 	Events.run_started.emit()
 	Events.xp_changed.emit(0, GameState.progression.xp_needed(), 1)
-	Audio.play_music(setup.map.music_id)
+	Audio.play_music(&"ranked" if setup.is_ranked() else setup.map.music_id)
+	started.emit()
 
 
 func _exit_tree() -> void:
@@ -83,6 +100,9 @@ func end_run(victory: bool) -> void:
 	_ending = true
 	GameState.is_running = false
 	var result := GameState.build_result(victory)
+	var player := Player.find(get_tree())
+	if not victory and player:
+		result.death_cause = player.last_damage_source
 	var profile := Save.profile
 	ProgressService.finalize_run(profile, result, Config.game, Content.achievements, Content.unlockables())
 	profile.last_character_id = result.character_id
@@ -92,7 +112,6 @@ func end_run(victory: bool) -> void:
 				result.time, result.score, true))
 		result.rank_position = Ranking.position_for_score(result.map_id, result.score)
 	Save.save_data()
-	Audio.play(&"victory" if victory else &"defeat")
 	# Camera lenta e depois a tela de resultado (com o jogo pausado).
 	Engine.time_scale = 0.35
 	await get_tree().create_timer(END_DELAY, true, false, true).timeout

@@ -18,4 +18,4 @@ func attack() -> void:
 		var t := 0.0 if count == 1 else (float(i) / (count - 1) - 0.5)
 		var angle := base + t * spread + _rng.randf_range(-0.03, 0.03)
 		projectiles.spawn_bullet(self, from, Vector2.from_angle(angle))
-	Audio.play(data.sound_id, -8.0)
+	Audio.play(data.sound_id)

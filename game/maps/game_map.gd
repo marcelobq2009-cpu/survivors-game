@@ -8,6 +8,10 @@ extends Node3D
 
 const GROUP := &"game_map"
 
+## Progresso da construcao (0..1) e o que esta sendo feito (tela de carregamento).
+signal build_progress(ratio: float, step: String)
+
+var is_built: bool = false
 var grid: MapGrid
 var bounds: Rect2
 var player_spawn: Vector2 = Vector2.ZERO
@@ -17,14 +21,13 @@ func _enter_tree() -> void:
 	add_to_group(GROUP)
 
 
-func _ready() -> void:
-	build()
-
-
-## Subclasses constroem o mapa aqui e preenchem grid/bounds/player_spawn.
-func build() -> void:
+## Constroi o mapa (pode levar varios frames; o World espera com tela de
+## carregamento). Subclasses preenchem grid/bounds/player_spawn.
+func build_async() -> void:
 	bounds = Rect2(-50, -50, 100, 100)
 	grid = MapGrid.new(bounds)
+	is_built = true
+	build_progress.emit(1.0, "")
 
 
 static func find(tree: SceneTree) -> GameMap:

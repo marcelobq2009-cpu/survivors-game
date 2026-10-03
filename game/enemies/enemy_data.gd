@@ -13,6 +13,10 @@ enum Behavior {
 @export var behavior: Behavior = Behavior.CHASE
 @export var is_boss: bool = false
 
+enum ModelKind { WALKER, RUNNER, BRUTE, BLOATER, COLOSSUS, MUTANT }
+## Silhueta do modelo placeholder (cada tipo reconhecivel de longe).
+@export var model_kind: ModelKind = ModelKind.WALKER
+
 @export_group("Stats")
 @export var max_health: float = 10.0
 ## Metros por segundo.
@@ -29,7 +33,7 @@ enum Behavior {
 @export var explode_trigger_distance: float = 1.6
 @export var explode_radius: float = 2.6
 @export var explode_damage: float = 18.0
-@export var explode_fuse: float = 0.7
+@export var explode_fuse: float = 1.0
 ## CHARGER: a cada X segundos, investida com esta velocidade por Y segundos.
 @export var charge_interval: float = 5.0
 @export var charge_speed: float = 9.0

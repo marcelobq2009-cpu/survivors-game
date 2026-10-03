@@ -6,10 +6,12 @@ extends Node
 const CHARACTERS_DIR := "res://data/characters/"
 const MAPS_DIR := "res://data/maps/"
 const ACHIEVEMENTS_DIR := "res://data/achievements/"
+const META_DIR := "res://data/meta_upgrades/"
 
 var characters: Array[CharacterData] = []
 var maps: Array[MapData] = []
 var achievements: Array[AchievementData] = []
+var meta_upgrades: Array[MetaUpgradeData] = []
 
 
 func _ready() -> void:
@@ -20,6 +22,13 @@ func reload() -> void:
 	characters.assign(_load_dir(CHARACTERS_DIR))
 	maps.assign(_load_dir(MAPS_DIR))
 	achievements.assign(_load_dir(ACHIEVEMENTS_DIR))
+	meta_upgrades.clear()
+	for f: String in ResourceLoader.list_directory(META_DIR):
+		if f.ends_with(".tres"):
+			var m := load(META_DIR.path_join(f)) as MetaUpgradeData
+			if m:
+				meta_upgrades.append(m)
+	meta_upgrades.sort_custom(func(a: MetaUpgradeData, b: MetaUpgradeData) -> bool: return a.sort_order < b.sort_order)
 
 
 func find_character(id: StringName) -> CharacterData:

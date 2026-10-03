@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MetaUpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/meta/meta_upgrade_data.gd" id="1_meta"]
+
+[resource]
+script = ExtResource("1_meta")
+id = &"agility"
+title = "Agilidade"
+description = "+{v} m/s de velocidade"
+stat = &"move_speed"
+value_per_level = 0.15
+max_level = 5
+base_cost = 60
+cost_growth = 1.6
+color = Color(0.45, 0.85, 1, 1)
+sort_order = 2

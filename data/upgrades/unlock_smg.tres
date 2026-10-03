@@ -9,6 +9,7 @@ id = &"unlock_smg"
 title = "Nova arma: Metralhadora"
 description = "Rajada rápida e imprecisa."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_wk4ds")
 max_picks = 1
 weight = 1.2

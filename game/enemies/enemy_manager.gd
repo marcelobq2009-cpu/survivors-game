@@ -15,6 +15,8 @@ const SEPARATION := 0.5
 const PROBE := 0.9
 const FLASH_TIME := 0.1
 const KNOCKBACK_DECAY := 7.0
+## Tempo de aviso antes da investida do chefe (o jogador ve a linha no chao).
+const WINDUP_TIME := 0.8
 
 enum State { NORMAL, FUSE, WINDUP, CHARGE }
 
@@ -81,6 +83,8 @@ func spawn(data: EnemyData, pos: Vector2, health_mult: float = 1.0, damage_mult:
 	a.state_timer = data.charge_interval * _rng.randf_range(0.5, 1.0)
 	a.index = agents.size()
 	agents.append(a)
+	if elite:
+		Events.elite_spawned.emit(data)
 	if not _renderers.has(data):
 		_create_renderer(data)
 	return a
@@ -150,6 +154,7 @@ func _physics_process(delta: float) -> void:
 	var rig := CameraRig.find(get_tree())
 	var recycle_dist := (rig.visible_ground_radius() if rig else 30.0) * 1.8
 	var contact := 0.0
+	var contact_source := ""
 	_parity = 1 - _parity
 	var i := 0
 
@@ -173,6 +178,7 @@ func _physics_process(delta: float) -> void:
 				if a.state == State.NORMAL and dist < a.data.explode_trigger_distance:
 					a.state = State.FUSE
 					a.state_timer = a.data.explode_fuse
+					Events.explosion_warning.emit(a.pos, a.data.explode_radius * a.scale, a.data.explode_fuse)
 				if a.state == State.FUSE:
 					speed = 0.0
 					a.flash = 0.5 + 0.5 * sin(_time * 30.0)
@@ -191,11 +197,12 @@ func _physics_process(delta: float) -> void:
 		a.flash = maxf(0.0, a.flash - delta / FLASH_TIME) if a.state != State.FUSE else a.flash
 		a.knockback = a.knockback.lerp(Vector2.ZERO, minf(1.0, KNOCKBACK_DECAY * delta))
 
-		if dist < a.radius + player_radius:
-			contact = maxf(contact, a.damage)
+		if dist < a.radius + player_radius and a.damage > contact:
+			contact = a.damage
+			contact_source = a.data.display_name + (" (elite)" if a.elite else "")
 
 	if contact > 0.0:
-		Events.player_contact.emit(contact)
+		Events.player_contact.emit(contact, contact_source)
 
 
 func _process(_delta: float) -> void:
@@ -273,16 +280,16 @@ func _relocate(a: EnemyAgent, player_pos: Vector2, rig: CameraRig) -> void:
 func _explode(a: EnemyAgent, player_pos: Vector2) -> void:
 	var radius := a.data.explode_radius * a.scale
 	if a.pos.distance_to(player_pos) <= radius + GameState.player_radius:
-		Events.player_contact.emit(a.data.explode_damage * (a.damage / maxf(0.01, a.data.contact_damage)))
+		Events.player_contact.emit(a.data.explode_damage * (a.damage / maxf(0.01, a.data.contact_damage)),
+				"Explosão do %s" % a.data.display_name)
 	# Tambem fere os zumbis em volta (reacao em cadeia).
 	var hit: Array[EnemyAgent] = []
 	grid.query_radius(a.pos, radius, hit)
 	for n: EnemyAgent in hit:
 		if n != a and n.alive:
 			damage_agent(n, a.data.explode_damage, false, (n.pos - a.pos).normalized() * 4.0, &"")
-	Events.explosion.emit(a.pos, radius)
+	Events.explosion.emit(a.pos, radius, &"explosion")
 	Events.camera_shake_requested.emit(4.0)
-	Audio.play(&"explosion", -4.0)
 	kill(a)
 
 
@@ -293,14 +300,16 @@ func _update_charger(a: EnemyAgent, dir: Vector2, dist: float, delta: float) -> 
 		State.NORMAL:
 			if a.state_timer <= 0.0 and dist < 16.0:
 				a.state = State.WINDUP
-				a.state_timer = 0.6
+				a.state_timer = WINDUP_TIME
+				a.charge_dir = dir
+				Events.charge_warning.emit(a.pos, dir, a.data.charge_speed * a.data.charge_duration,
+						WINDUP_TIME)
 			return a.speed
 		State.WINDUP:
 			a.flash = 0.6
 			if a.state_timer <= 0.0:
 				a.state = State.CHARGE
 				a.state_timer = a.data.charge_duration
-				a.charge_dir = dir
 				Events.camera_shake_requested.emit(2.0)
 			return 0.0
 		State.CHARGE:
@@ -314,7 +323,7 @@ func _update_charger(a: EnemyAgent, dir: Vector2, dist: float, delta: float) -> 
 func _create_renderer(data: EnemyData) -> void:
 	var r := InstanceRenderer.new()
 	r.name = "Render_%s" % data.id
-	var mesh := data.mesh if data.mesh else PlaceholderMeshes.zombie(data.body_color, data.skin_color)
+	var mesh := data.mesh if data.mesh else PlaceholderMeshes.zombie_kind(data.model_kind, data.body_color, data.skin_color)
 	r.setup(mesh, _material, 64, false)
 	add_child(r)
 	_renderers[data] = r

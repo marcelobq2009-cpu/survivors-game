@@ -9,6 +9,7 @@ id = &"unlock_pistol"
 title = "Nova arma: Pistola"
 description = "Atira no zumbi mais próximo."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_24rqu")
 max_picks = 1
 tag = &"arma"

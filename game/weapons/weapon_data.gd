@@ -36,7 +36,12 @@ enum Visual { BULLET, PELLET, BALL }
 ## Se true, recebe os projeteis extras do jogador (stat projectile_bonus).
 @export var uses_projectile_bonus: bool = true
 @export var max_level: int = 8
+## Segundos de chamas no chao depois da explosao (0 = sem fogo). Ex.: molotov.
+@export var fire_duration: float = 0.0
 
 @export_group("Visual")
 @export var projectile_visual: Visual = Visual.BULLET
-@export var sound_id: StringName = &"shoot"
+## Som do disparo/ataque (ver game/audio/sound_catalog.gd).
+@export var sound_id: StringName = &"weapon_pistol_fire"
+## Som do impacto/explosao (arremessos).
+@export var impact_sound_id: StringName = &"explosion"

@@ -12,7 +12,7 @@ signal game_paused(paused: bool)
 signal pause_requested  ## Ex.: botao de pausa do HUD (toque).
 
 # --- Jogador ---
-signal player_contact(damage: float)  ## Um zumbi encostou (ou explodiu) no jogador.
+signal player_contact(damage: float, source: String)  ## Algo feriu o jogador (source = quem, ex.: "Colosso").
 signal player_damaged(amount: float)
 signal player_health_changed(current: float, max_value: float)
 signal player_healed(amount: float)  ## Ex.: bau.
@@ -21,7 +21,13 @@ signal player_died
 # --- Combate ---
 signal enemy_killed(agent: EnemyAgent)
 signal damage_dealt(position: Vector2, amount: float, crit: bool)
-signal explosion(position: Vector2, radius: float)
+signal explosion(position: Vector2, radius: float, sound: StringName)
+## Avisos de perigo (visual + som + legenda): explosao prestes a acontecer e investida de chefe.
+signal explosion_warning(position: Vector2, radius: float, duration: float)
+signal charge_warning(position: Vector2, direction: Vector2, length: float, duration: float)
+signal elite_spawned(data: EnemyData)
+## Evento especial comecou (horde, supply, toxic) perto de `position`.
+signal event_started(kind: StringName, position: Vector2)
 signal boss_spawned(data: EnemyData)
 signal boss_killed(data: EnemyData)
 
@@ -39,3 +45,5 @@ signal announcement(text: String, color: Color)
 
 # --- Feedback ---
 signal camera_shake_requested(strength: float)
+## Legenda de um som importante (acessibilidade: "Inchado vai explodir!").
+signal audio_caption(text: String)

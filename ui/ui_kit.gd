@@ -34,13 +34,14 @@ static func button(text: String, min_size: Vector2 = Vector2(0, TOUCH_HEIGHT), f
 
 
 ## "Afunda" o botao ao tocar e toca um clique (feedback de toque).
-static func add_press_feedback(b: BaseButton) -> void:
+static func add_press_feedback(b: BaseButton, sound: StringName = &"ui_click") -> void:
 	b.resized.connect(func() -> void: b.pivot_offset = b.size * 0.5)
 	b.button_down.connect(func() -> void:
 		b.create_tween().tween_property(b, "scale", Vector2(0.95, 0.95), 0.06))
 	b.button_up.connect(func() -> void:
 		b.create_tween().tween_property(b, "scale", Vector2.ONE, 0.08))
-	b.pressed.connect(func() -> void: Audio.play(&"click", -8.0))
+	if sound != &"":
+		b.pressed.connect(func() -> void: Audio.play(sound))
 
 
 static func label(text: String, font_size: int = 24, color: Color = TEXT,

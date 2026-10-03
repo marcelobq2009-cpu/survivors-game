@@ -27,6 +27,9 @@ func build_content() -> void:
 	_mode = SceneFlow.params.get("mode", RunSetup.Mode.NORMAL)
 	_view = SceneFlow.params.get("view", "play")
 	_step = Step.MAP if _view == "maps" else Step.CHARACTER
+	# Variacao mais calma da musica do menu (para ler e comparar).
+	Audio.play_music(&"menu")
+	Audio.set_intensity(1)
 	_character = _first_unlocked(Content.characters, Save.profile.last_character_id) as CharacterData
 	_map = _first_unlocked(Content.maps, Save.profile.last_map_id) as MapData
 	_steps_label = UiKit.label("", 24, UiKit.MUTED)
@@ -116,6 +119,8 @@ func _on_card_pressed(c: ContentData) -> void:
 			_character = c as CharacterData
 	elif c is MapData:
 		_show_map_details(c as MapData)
+		if c.id == &"rio":
+			Audio.play(&"amb_gull")  # identidade sonora do mapa (orla)
 		if ProgressService.is_unlocked(c, Save.profile):
 			_map = c as MapData
 	_update_next()

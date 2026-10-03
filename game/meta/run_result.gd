@@ -15,6 +15,8 @@ var damage_total: float = 0.0
 ## weapon_id -> dano causado
 var damage_by_weapon: Dictionary = {}
 var bosses_killed: int = 0
+## Quem causou a morte ("" se venceu ou desistiu).
+var death_cause: String = ""
 
 # Preenchidos pelo ProgressService ao fechar a partida:
 var score: int = 0

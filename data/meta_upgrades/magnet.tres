@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MetaUpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/meta/meta_upgrade_data.gd" id="1_meta"]
+
+[resource]
+script = ExtResource("1_meta")
+id = &"magnet"
+title = "Ímã"
+description = "+{v} m de alcance de coleta"
+stat = &"pickup_radius"
+value_per_level = 0.4
+max_level = 4
+base_cost = 50
+cost_growth = 1.6
+color = Color(0.75, 0.6, 1, 1)
+sort_order = 3

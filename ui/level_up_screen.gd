@@ -7,6 +7,11 @@ const CHOICES := 3
 ## Evita que um toque "atrasado" escolha uma carta sem querer.
 const INPUT_DELAY := 0.4
 const CARD_SIZE := Vector2(330, 360)
+const RARITY_NAMES: PackedStringArray = ["COMUM", "RARA", "ÉPICA", "LENDÁRIA"]
+const RARITY_COLORS: Array[Color] = [Color(0.7, 0.7, 0.7), Color(0.35, 0.65, 1.0),
+	Color(0.75, 0.4, 1.0), Color(1.0, 0.78, 0.2)]
+const RARITY_SOUNDS: Array[StringName] = [&"ui_card_pick_common", &"ui_card_pick_rare",
+	&"ui_card_pick_epic", &"ui_card_pick_legendary"]
 const TAG_NAMES: Dictionary = {
 	&"dano": "DANO", &"cadencia": "CADÊNCIA", &"critico": "CRÍTICO", &"area": "ÁREA",
 	&"projeteis": "PROJÉTEIS", &"defesa": "DEFESA", &"utilidade": "UTILIDADE",
@@ -92,7 +97,9 @@ func _show_next() -> void:
 	_root.show()
 	_root.modulate.a = 0.0
 	create_tween().tween_property(_root, "modulate:a", 1.0, 0.15)
-	Audio.play(&"level_up" if kind == "level" else &"chest")
+	Audio.play(&"ui_card_open")
+	Audio.duck(SoundCatalog.BUS_SFX, -12.0, 0.6)
+	Audio.duck(SoundCatalog.BUS_ZOMBIES, -14.0, 0.6)
 	_set_cards_enabled(false)
 	await get_tree().create_timer(INPUT_DELAY, true).timeout
 	_set_cards_enabled(true)
@@ -104,9 +111,13 @@ func _make_card(u: UpgradeData) -> Button:
 	b.focus_mode = Control.FOCUS_NONE
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.09, 0.08, 0.08, 0.97)
-	style.border_color = u.color
-	style.set_border_width_all(4)
+	var rarity_color := RARITY_COLORS[u.rarity]
+	style.border_color = u.color if u.rarity == UpgradeData.Rarity.COMMON else rarity_color
+	style.set_border_width_all(4 + u.rarity * 2)
 	style.border_width_top = 14
+	if u.rarity >= UpgradeData.Rarity.EPIC:
+		style.shadow_color = Color(rarity_color, 0.55)
+		style.shadow_size = 10 + u.rarity * 4
 	style.set_corner_radius_all(18)
 	b.add_theme_stylebox_override(&"normal", style)
 	var hover := style.duplicate() as StyleBoxFlat
@@ -114,7 +125,7 @@ func _make_card(u: UpgradeData) -> Button:
 	b.add_theme_stylebox_override(&"hover", hover)
 	b.add_theme_stylebox_override(&"pressed", hover)
 	b.add_theme_stylebox_override(&"disabled", style)
-	UiKit.add_press_feedback(b)
+	UiKit.add_press_feedback(b, &"")
 	var col := UiKit.vbox(10)
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	UiKit.full_rect(col)
@@ -123,7 +134,10 @@ func _make_card(u: UpgradeData) -> Button:
 	col.offset_top = 28
 	col.offset_bottom = -18
 	b.add_child(col)
-	col.add_child(UiKit.label(TAG_NAMES.get(u.tag, "MELHORIA"), 18, u.color, HORIZONTAL_ALIGNMENT_CENTER))
+	var header := TAG_NAMES.get(u.tag, "MELHORIA") as String
+	if u.rarity > UpgradeData.Rarity.COMMON:
+		header = "%s  ·  %s" % [RARITY_NAMES[u.rarity], header]
+	col.add_child(UiKit.label(header, 18, rarity_color if u.rarity > 0 else u.color, HORIZONTAL_ALIGNMENT_CENTER))
 	var title := UiKit.label(u.title, 28, UiKit.TEXT, HORIZONTAL_ALIGNMENT_CENTER)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(title)
@@ -162,8 +176,7 @@ func _on_card_pressed(u: UpgradeData) -> void:
 	_set_cards_enabled(false)
 	GameState.register_pick(u)
 	Events.upgrade_chosen.emit(u)
-	if u.kind == UpgradeData.Kind.EVOLVE:
-		Audio.play(&"evolve")
+	Audio.play(RARITY_SOUNDS[u.rarity])
 	if not _queue.is_empty():
 		_show_next()
 	else:

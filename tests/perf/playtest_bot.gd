@@ -45,6 +45,7 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	Engine.max_fps = 0  # o robo roda o mais rapido possivel
 	if _done:
 		return
 	_frame_ms.append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)

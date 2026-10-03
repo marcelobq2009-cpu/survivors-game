@@ -18,11 +18,15 @@ func attack() -> void:
 		return
 	var dir := (target.pos - from).normalized()
 	enemies.grid.query_radius(from, reach + EnemyManager.MAX_ENEMY_RADIUS, _targets)
+	var hits := 0
 	for e: EnemyAgent in _targets:
 		var to := e.pos - from
 		if to.length() > reach + e.radius:
 			continue
 		if absf(dir.angle_to(to)) <= ARC * 0.5 or to.length() < 0.8:
 			hit(e, to.normalized())
+			hits += 1
+	if hits > 0:
+		Audio.play(&"weapon_machete_hit", minf(4.0, hits - 1.0))
 	Effects.find(get_tree()).slash(from, dir, reach, data.color)
-	Audio.play(data.sound_id, -6.0)
+	Audio.play(data.sound_id)

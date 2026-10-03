@@ -22,6 +22,8 @@ func _on_setup() -> void:
 	_disk.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_disk.position.y = 0.08
 	add_child(_disk)
+	Audio.play(&"weapon_gas_start")
+	Audio.start_loop(&"weapon_gas", &"weapon_gas_loop")
 
 
 func _process(_delta: float) -> void:
@@ -40,3 +42,7 @@ func attack() -> void:
 	for e: EnemyAgent in _targets:
 		if e.alive and e.pos.distance_to(from) <= r + e.radius:
 			hit(e, (e.pos - from).normalized() * 0.3)
+
+
+func _exit_tree() -> void:
+	Audio.stop_loop(&"weapon_gas", 0.4)

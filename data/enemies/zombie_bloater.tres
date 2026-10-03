@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_xoyvi")
 id = &"zombie_bloater"
+model_kind = 3
 display_name = "Inchado"
 behavior = 1
 max_health = 22.0
@@ -16,4 +17,4 @@ explode_damage = 16.0
 gold_chance = 0.08
 body_color = Color(0.6, 0.55, 0.2, 1)
 skin_color = Color(0.7, 0.78, 0.35, 1)
-model_scale = 1.2
+model_scale = 1.0

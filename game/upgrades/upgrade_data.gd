@@ -12,6 +12,8 @@ enum Kind {
 	GOLD,         ## Da `value` de ouro (carta "reserva").
 }
 
+enum Rarity { COMMON, RARE, EPIC, LEGENDARY }
+
 @export var id: StringName = &"upgrade"
 @export var title: String = "Upgrade"
 @export_multiline var description: String = ""
@@ -31,6 +33,8 @@ enum Kind {
 @export var weight: float = 1.0
 ## Categoria de build (dano, critico, defesa, area...). So informativa/UI.
 @export var tag: StringName = &""
+## Raridade: muda o visual e o som da carta (comum, rara, epica, lendaria).
+@export var rarity: Rarity = Rarity.COMMON
 
 @export_group("Requisitos e evolucao")
 ## Nivel minimo da arma `weapon` para aparecer (EVOLVE usa isto).

@@ -9,6 +9,7 @@ id = &"unlock_molotov"
 title = "Nova arma: Molotov"
 description = "Explode em área onde cai."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_15stb")
 max_picks = 1
 weight = 1.2

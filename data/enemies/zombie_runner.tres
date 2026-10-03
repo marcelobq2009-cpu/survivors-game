@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_v3bc3")
 id = &"zombie_runner"
+model_kind = 1
 display_name = "Corredor"
 max_health = 9.0
 speed = 3.1

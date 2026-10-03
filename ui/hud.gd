@@ -23,6 +23,8 @@ var _announce_busy: bool = false
 var _hp_ratio: float = 1.0
 var _boss_poll: float = 0.0
 var _time: float = 0.0
+var _caption: Label
+var _caption_left: float = 0.0
 
 
 func _ready() -> void:
@@ -35,6 +37,7 @@ func _ready() -> void:
 	_low_hp.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(UiKit.full_rect(_low_hp))
 	root.add_child(UiKit.full_rect(TouchJoystick.new()))
+	root.add_child(UiKit.full_rect(ThreatIndicators.new()))
 
 	_xp_bar = UiKit.bar(Color(0.35, 0.85, 1.0), 12)
 	_xp_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -60,6 +63,23 @@ func _ready() -> void:
 	_announce.offset_right = 600
 	_announce.modulate.a = 0.0
 	root.add_child(_announce)
+
+	# Legendas de alertas sonoros (acessibilidade).
+	_caption = UiKit.label("", 26, UiKit.TEXT, HORIZONTAL_ALIGNMENT_CENTER)
+	_caption.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	_caption.offset_top = -120
+	_caption.offset_bottom = -80
+	_caption.offset_left = -500
+	_caption.offset_right = 500
+	var cap_bg := StyleBoxFlat.new()
+	cap_bg.bg_color = Color(0, 0, 0, 0.6)
+	cap_bg.set_corner_radius_all(8)
+	cap_bg.content_margin_left = 12
+	cap_bg.content_margin_right = 12
+	_caption.add_theme_stylebox_override(&"normal", cap_bg)
+	_caption.hide()
+	root.add_child(_caption)
+	Events.audio_caption.connect(_on_caption)
 
 	Events.xp_changed.connect(_on_xp_changed)
 	Events.player_health_changed.connect(_on_health_changed)
@@ -137,6 +157,9 @@ func _process(delta: float) -> void:
 	# Vida baixa: tela avermelhada pulsando.
 	var danger := clampf((0.3 - _hp_ratio) / 0.3, 0.0, 1.0)
 	_low_hp.color.a = danger * (0.12 + 0.08 * sin(_time * 6.0))
+	_caption_left -= delta
+	if _caption_left <= 0.0 and _caption.visible:
+		_caption.hide()
 	_boss_poll -= delta
 	if _boss_poll <= 0.0:
 		_boss_poll = 0.15
@@ -213,3 +236,9 @@ func _pulse(c: Control) -> void:
 	var tw := c.create_tween()
 	tw.tween_property(c, "scale", Vector2(1.2, 1.2), 0.06)
 	tw.tween_property(c, "scale", Vector2.ONE, 0.1)
+
+
+func _on_caption(text: String) -> void:
+	_caption.text = "[ %s ]" % text
+	_caption.show()
+	_caption_left = 1.8

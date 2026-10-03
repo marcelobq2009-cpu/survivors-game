@@ -33,6 +33,9 @@ func _on_run_ended(r: RunResult) -> void:
 		title = "FIM DA CORRIDA RANQUEADA"
 		color = UiKit.ACCENT
 	col.add_child(UiKit.label(title, 52, color, HORIZONTAL_ALIGNMENT_CENTER))
+	if r.death_cause != "":
+		col.add_child(UiKit.label("Causa da morte: %s" % r.death_cause, 26, UiKit.TEXT,
+				HORIZONTAL_ALIGNMENT_CENTER))
 
 	var body := UiKit.hbox(24)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -101,7 +104,6 @@ func _fill(r: RunResult) -> void:
 	if r.is_ranked():
 		if r.new_record:
 			_side.add_child(UiKit.label("NOVO RECORDE!", 34, UiKit.TOXIC))
-			Audio.play(&"record")
 		_side.add_child(UiKit.label("Sua posição global: #%d" % r.rank_position, 26, UiKit.TEXT))
 	elif r.new_record:
 		_side.add_child(UiKit.label("NOVO RECORDE DE TEMPO!", 28, UiKit.TOXIC))
@@ -110,11 +112,11 @@ func _fill(r: RunResult) -> void:
 		for c: ContentData in r.new_unlocks:
 			var kind := "Personagem" if c is CharacterData else "Mapa"
 			_side.add_child(UiKit.label("%s: %s" % [kind, c.display_name], 24, c.color.lightened(0.2)))
-		Audio.play(&"unlock")
 	if not r.new_achievements.is_empty():
 		_side.add_child(UiKit.label("CONQUISTAS", 26, UiKit.ACCENT))
 		for a: AchievementData in r.new_achievements:
 			_side.add_child(UiKit.label("%s (+%d)" % [a.display_name, a.reward_gold], 20, UiKit.TEXT))
+	_play_reward_sounds(r)
 	if r.new_unlocks.is_empty() and not r.victory and not r.is_ranked():
 		var hint := _next_goal_hint()
 		if hint != "":
@@ -131,3 +133,21 @@ func _next_goal_hint() -> String:
 			if not req.is_met(Save.profile):
 				return "%s para desbloquear %s." % [req.describe(), c.display_name]
 	return ""
+
+
+## Sons das recompensas em sequencia (sem atropelar), depois a musica volta suave.
+func _play_reward_sounds(r: RunResult) -> void:
+	var queue: Array[StringName] = []
+	if r.new_record:
+		queue.append(&"reward_new_record")
+	for c: ContentData in r.new_unlocks:
+		queue.append(&"reward_unlock_character" if c is CharacterData else &"reward_unlock_map")
+	if not r.new_achievements.is_empty():
+		queue.append(&"reward_achievement")
+	await get_tree().create_timer(1.6, true, false, true).timeout
+	for id: StringName in queue:
+		Audio.play(id)
+		await get_tree().create_timer(1.3, true, false, true).timeout
+	await get_tree().create_timer(1.0, true, false, true).timeout
+	Audio.play_music(&"menu")
+	Audio.set_intensity(1)

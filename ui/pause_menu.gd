@@ -65,12 +65,14 @@ func toggle() -> void:
 		_root.hide()
 		_show_settings(false)
 		GameState.release_pause(self)
+		Audio.play(&"ui_pause_off")
 		Events.game_paused.emit(false)
 	elif GameState.is_running and not get_tree().paused:
 		_quit_armed = false
 		_quit_button.text = "SAIR DA PARTIDA"
 		_root.show()
 		GameState.request_pause(self)
+		Audio.play(&"ui_pause_on")
 		Events.game_paused.emit(true)
 
 

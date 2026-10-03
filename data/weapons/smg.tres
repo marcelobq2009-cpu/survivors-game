@@ -18,4 +18,4 @@ spread_degrees = 8.0
 target_range = 13.0
 knockback = 0.8
 uses_projectile_bonus = false
-sound_id = &"smg"
+sound_id = &"weapon_smg_fire"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MetaUpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/meta/meta_upgrade_data.gd" id="1_meta"]
+
+[resource]
+script = ExtResource("1_meta")
+id = &"looter"
+title = "Saqueador"
+description = "+{p}% de ouro"
+stat = &"gold_mult"
+value_per_level = 0.1
+max_level = 5
+base_cost = 70
+cost_growth = 1.6
+color = Color(1, 0.82, 0.3, 1)
+sort_order = 5

@@ -9,6 +9,7 @@ id = &"unlock_gas"
 title = "Nova arma: Gás"
 description = "Nuvem que fere tudo ao seu redor."
 kind = 0
+rarity = 1
 weapon = ExtResource("2_e4pm4")
 max_picks = 1
 tag = &"arma"

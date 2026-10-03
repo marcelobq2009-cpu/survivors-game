@@ -8,7 +8,7 @@ extends Resource
 ## Liga as ferramentas de debug (painel DBG na partida, desbloquear tudo etc.).
 @export var debug_mode: bool = true
 ## Se true, o debug tambem aparece na build web/release (util enquanto o jogo esta em teste).
-@export var debug_tools_in_release: bool = true
+@export var debug_tools_in_release: bool = false
 ## Se true, a partida normal dura `debug_match_duration` (para testar o fim rapido).
 @export var use_debug_match_duration: bool = false
 @export var debug_match_duration: float = 60.0
@@ -41,5 +41,9 @@ func match_duration() -> float:
 	return debug_match_duration if use_debug_match_duration else normal_match_duration
 
 
+## No PC/editor: sempre. Na versao publicada: so se `debug_tools_in_release`
+## ou se o jogador liberou pelo codigo secreto (7 toques na versao do menu).
 func debug_tools_enabled() -> bool:
-	return debug_mode and (OS.is_debug_build() or debug_tools_in_release)
+	if not debug_mode:
+		return false
+	return OS.is_debug_build() or debug_tools_in_release or Save.profile.settings.debug_unlocked

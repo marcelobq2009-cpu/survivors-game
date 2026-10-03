@@ -24,6 +24,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if not _world.has_started:
+		return
 	_frame += 1
 	match _frame:
 		60:

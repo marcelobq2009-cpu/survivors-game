@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_t82lc")
 id = &"zombie_brute"
+model_kind = 2
 display_name = "Brutamontes"
 max_health = 70.0
 speed = 1.1
@@ -16,4 +17,4 @@ gold_chance = 0.12
 gold_value = 2
 body_color = Color(0.25, 0.3, 0.22, 1)
 skin_color = Color(0.5, 0.6, 0.42, 1)
-model_scale = 1.45
+model_scale = 1.15

@@ -26,6 +26,7 @@ func before_each() -> void:
 	world = WORLD_SCENE.instantiate() as World
 	world.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child_autofree(world)
+	await wait_for_signal(world.started, 20.0)
 	await wait_physics_frames(2)
 
 
@@ -91,7 +92,7 @@ func test_death_ends_run_and_saves() -> void:
 	watch_signals(Events)
 	var runs_before := Save.profile.total_runs
 	var player := Player.find(get_tree())
-	Events.player_contact.emit(player.health.max_value * 10.0)
+	Events.player_contact.emit(player.health.max_value * 10.0, "Teste")
 	await wait_seconds(World.END_DELAY + 0.5)
 	assert_signal_emitted(Events, "run_ended")
 	assert_false(GameState.is_running)

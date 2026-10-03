@@ -31,6 +31,10 @@ class Proj:
 
 
 var _active: Array[Proj] = []
+## Chamas no chao (molotov): [pos, raio, segundos restantes, timer de dano, arma]
+var _fires: Array[Array] = []
+const FIRE_TICK := 0.5
+const FIRE_DAMAGE_RATIO := 0.35
 var _free: Array[Proj] = []
 var _renderers: Dictionary = {}  # WeaponData.Visual -> InstanceRenderer
 var _candidates: Array[EnemyAgent] = []
@@ -96,6 +100,7 @@ func _physics_process(delta: float) -> void:
 	if _enemies == null:
 		_enemies = EnemyManager.find(get_tree())
 		_map = GameMap.find(get_tree())
+	_update_fires(delta)
 	for i: int in range(_active.size() - 1, -1, -1):
 		var p := _active[i]
 		var alive := _update_bullet(p, delta) if p.kind == Kind.BULLET else _update_thrown(p, delta)
@@ -140,9 +145,13 @@ func _update_thrown(p: Proj, delta: float) -> bool:
 	for e: EnemyAgent in _candidates:
 		if e.alive and e.pos.distance_to(p.pos) <= p.radius + e.radius:
 			p.weapon.hit(e, (e.pos - p.pos).normalized())
-	Events.explosion.emit(p.pos, p.radius)
+	Events.explosion.emit(p.pos, p.radius, p.weapon.data.impact_sound_id)
+	if p.weapon.data.fire_duration > 0.0:
+		_fires.append([p.pos, p.radius, p.weapon.data.fire_duration, 0.0, p.weapon])
+		var fx := Effects.find(get_tree())
+		if fx:
+			fx.fire_patch(p.pos, p.radius, p.weapon.data.fire_duration)
 	Events.camera_shake_requested.emit(2.5)
-	Audio.play(&"explosion", -6.0)
 	return false
 
 
@@ -168,3 +177,34 @@ func _add_renderer(visual: int, mesh: Mesh, mat: Material) -> void:
 	r.setup(mesh, mat, 128)
 	add_child(r)
 	_renderers[visual] = r
+
+
+## Chamas no chao: dano periodico em quem estiver dentro + som de fogo
+## (um loop so, posicionado na chama mais perto do jogador).
+func _update_fires(delta: float) -> void:
+	if _fires.is_empty():
+		if Audio.has_loop(&"fire"):
+			Audio.stop_loop(&"fire", 0.5)
+		return
+	var nearest := Vector2.INF
+	for i: int in range(_fires.size() - 1, -1, -1):
+		var f: Array = _fires[i]
+		f[2] = float(f[2]) - delta
+		f[3] = float(f[3]) - delta
+		var weapon: Weapon = f[4]
+		if float(f[2]) <= 0.0 or not is_instance_valid(weapon):
+			_fires.remove_at(i)
+			continue
+		var pos: Vector2 = f[0]
+		if nearest == Vector2.INF or pos.distance_squared_to(GameState.player_position) \
+				< nearest.distance_squared_to(GameState.player_position):
+			nearest = pos
+		if float(f[3]) <= 0.0 and _enemies:
+			f[3] = FIRE_TICK
+			_enemies.grid.query_radius(pos, float(f[1]) + EnemyManager.MAX_ENEMY_RADIUS, _candidates)
+			for e: EnemyAgent in _candidates:
+				if e.alive and e.pos.distance_to(pos) <= float(f[1]) + e.radius:
+					var r := weapon.roll_damage()
+					_enemies.damage_agent(e, r.x * FIRE_DAMAGE_RATIO, false, Vector2.ZERO, weapon.data.id)
+	if nearest != Vector2.INF:
+		Audio.start_loop(&"fire", &"weapon_fire_loop", 0.0, nearest)

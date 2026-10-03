@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MetaUpgradeData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/meta/meta_upgrade_data.gd" id="1_meta"]
+
+[resource]
+script = ExtResource("1_meta")
+id = &"recovery"
+title = "Recuperação"
+description = "+{v} de vida por segundo"
+stat = &"regen"
+value_per_level = 0.15
+max_level = 3
+base_cost = 120
+cost_growth = 1.9
+color = Color(1, 0.5, 0.65, 1)
+sort_order = 7

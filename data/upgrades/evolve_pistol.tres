@@ -10,6 +10,7 @@ id = &"evolve_pistol"
 title = "EVOLUÇÃO: Pistola Rajada"
 description = "Pistola Nv. 5 + Mira Treinada: rajadas que atravessam."
 kind = 4
+rarity = 3
 weapon = ExtResource("3_dmacl")
 max_picks = 1
 tag = &"evolucao"
