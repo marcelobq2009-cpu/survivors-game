@@ -104,12 +104,16 @@ func _ready() -> void:
 		a.bus = SoundCatalog.BUS_AMBIENCE
 		a.volume_db = SILENT_DB
 		_amb_players.append(a)
-	# Na abertura so os sons da interface (o resto e preparado no carregamento
-	# da partida, onde uma pequena espera e natural).
+	# Fila de preparo em segundo plano (poucos ms por frame): primeiro a
+	# interface, depois o resto, enquanto o jogador esta no menu. O que faltar
+	# e terminado na tela de carregamento da partida.
 	for id: StringName in BAKE_FIRST:
 		_bake_queue.append(id)
 	for id: StringName in catalog:
 		if String(id).begins_with("ui_") and not _bake_queue.has(id):
+			_bake_queue.append(id)
+	for id: StringName in catalog:
+		if not _bake_queue.has(id):
 			_bake_queue.append(id)
 	apply_settings(Save.profile.settings)
 	Save.profile_changed.connect(func() -> void: apply_settings(Save.profile.settings))
