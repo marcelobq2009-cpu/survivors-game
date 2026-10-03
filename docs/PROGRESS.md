@@ -63,7 +63,8 @@ _Última atualização: 2026-10-03_
 
 ## Bugs / riscos conhecidos
 - Balanceamento: o robô vence com folga depois do min 10; humanos no celular devem sofrer mais (testar).
-- Primeira abertura: os sons são gerados e guardados em cache (alguns segundos a mais no carregamento).
+- 1ª partida na web: sons e músicas são gerados no carregamento (estimativa: 15–40 s num celular;
+  depois fica em cache e é rápido). Medir no aparelho real; se incomodar, trocar por arquivos `.ogg`.
 - Idioma: só Português (Inglês aparece como "em breve").
 - Zumbis contornam prédios por "deslizamento" (não é pathfinding completo): em becos podem enroscar.
 - iPhone (Safari) não permite travar a tela em paisagem: o jogador precisa girar o aparelho.
