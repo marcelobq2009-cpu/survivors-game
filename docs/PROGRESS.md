@@ -23,7 +23,13 @@ _Última atualização: 2026-10-03_
   sons placeholder sintetizados.
 - **Debug**: painel DBG (tempo, XP, ouro, zumbis, chefe, horda, matar todos, invencível,
   dificuldade, teleporte, ímã, baú, desbloquear, vencer), partidas curtas (Configurações), overlay F3/3 dedos.
-- **Testes**: ~85 testes GUT + robô de playtest + teste de estresse.
+- **Testes**: 77 testes GUT (lógica, save, ranking, dificuldade, integração 3D) + robô de playtest + teste de estresse + tour visual (`tests/perf/`).
+
+## Medições (PC, headless)
+- Estresse (minuto 25, 245–342 zumbis, 5 armas): física 3,2 ms/frame, desenho em lote 1,0 ms/frame, 409 nós.
+- Robô (jogador médio, normal): nível 24 e ~2.500 abates aos 10 min; morreu no 2º chefe (10:16).
+- Robô invencível (ranqueado 45 min): dificuldade 3,6x vida / 2,6x dano, 9 chefes, nível 67, física 3–6 ms.
+- Estimativa celular intermediário: 3–5x mais lento → 30–60 FPS no pior momento (confirmar no aparelho).
 
 ## Falta / próximos passos
 1. Testar no celular real (FPS no minuto 20+, conforto do joystick, legibilidade).
