@@ -29,4 +29,4 @@ func describe() -> String:
 	var map: MapData = Content.find_map(map_id)
 	if map:
 		map_name = map.display_name
-	return "Sobreviva %d min em %s" % [roundi(needed_seconds() / 60.0), map_name]
+	return "Sobreviva %d min no mapa %s" % [roundi(needed_seconds() / 60.0), map_name]

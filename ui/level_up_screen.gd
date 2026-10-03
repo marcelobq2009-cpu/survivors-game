@@ -15,6 +15,7 @@ const TAG_NAMES: Dictionary = {
 
 var _all_upgrades: Array[UpgradeData] = []
 var _queue: Array[String] = []  # "level" ou "chest"
+var _scheduled: bool = false  # evita abrir varias telas no mesmo frame
 var _rng := RandomNumberGenerator.new()
 var _root: Control
 var _title: Label
@@ -54,7 +55,8 @@ func _build() -> void:
 
 func _enqueue(kind: String) -> void:
 	_queue.append(kind)
-	if not _root.visible:
+	if not _root.visible and not _scheduled:
+		_scheduled = true
 		_show_next.call_deferred()
 
 
@@ -63,6 +65,7 @@ func is_open() -> bool:
 
 
 func _show_next() -> void:
+	_scheduled = false
 	if _queue.is_empty() or not GameState.is_running:
 		_close()
 		return

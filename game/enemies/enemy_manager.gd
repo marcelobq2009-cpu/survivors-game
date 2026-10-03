@@ -185,7 +185,7 @@ func _physics_process(delta: float) -> void:
 				if a.state == State.CHARGE:
 					dir = a.charge_dir
 
-		_move(a, dir, speed, delta, i)
+		_move(a, dir, speed, delta, i, dist < 1.5)
 		a.heading = lerp_angle(a.heading, GroundPlane.heading(dir), minf(1.0, 10.0 * delta)) \
 				if dir != Vector2.ZERO else a.heading
 		a.flash = maxf(0.0, a.flash - delta / FLASH_TIME) if a.state != State.FUSE else a.flash
@@ -214,8 +214,10 @@ func _process(_delta: float) -> void:
 
 # --- Movimento ----------------------------------------------------------------
 
-func _move(a: EnemyAgent, dir: Vector2, speed: float, delta: float, i: int) -> void:
-	var blocked := _map != null
+func _move(a: EnemyAgent, dir: Vector2, speed: float, delta: float, i: int,
+		near_player: bool = false) -> void:
+	# Colado no jogador: vai direto (um canto apertado nunca vira esconderijo).
+	var blocked := _map != null and not near_player
 	# Contorna paredes: se a frente esta bloqueada, tenta girar para um lado.
 	if blocked and dir != Vector2.ZERO and _map.grid.is_blocked(a.pos + dir * PROBE):
 		var side := 1.0 if (a.uid & 1) == 0 else -1.0

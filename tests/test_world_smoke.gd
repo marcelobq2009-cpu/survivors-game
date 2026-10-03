@@ -111,3 +111,50 @@ func test_normal_mode_victory_at_duration() -> void:
 func test_ranked_has_no_time_limit() -> void:
 	GameState.setup.mode = RunSetup.Mode.RANKED
 	assert_eq(GameState.setup.duration(), 0.0)
+
+
+func _first_card(screen: LevelUpScreen) -> Button:
+	for c: Node in screen.find_children("*", "Button", true, false):
+		var b := c as Button
+		if b and b.get_parent() is HBoxContainer and not b.disabled and not b.is_queued_for_deletion():
+			return b
+	return null
+
+
+func test_multiple_level_ups_give_one_choice_each() -> void:
+	for i: int in 3:
+		GameState.add_xp(GameState.progression.xp_needed())
+	await wait_process_frames(3)
+	var screen := world.get_node("LevelUpScreen") as LevelUpScreen
+	assert_true(screen.is_open(), "tela de level-up aparece")
+	assert_true(get_tree().paused, "jogo pausa")
+	for i: int in 3:
+		await wait_seconds(LevelUpScreen.INPUT_DELAY + 0.15)
+		var card := _first_card(screen)
+		assert_not_null(card, "carta %d disponivel" % (i + 1))
+		if card:
+			card.pressed.emit()
+		await wait_process_frames(2)
+	var total := 0
+	for v: int in GameState.upgrade_counts.values():
+		total += v
+	assert_eq(total, 3, "3 niveis = 3 escolhas")
+	assert_false(screen.is_open())
+	assert_false(get_tree().paused, "jogo volta")
+
+
+func test_pause_does_not_open_over_level_up() -> void:
+	GameState.add_xp(GameState.progression.xp_needed())
+	await wait_process_frames(3)
+	Events.pause_requested.emit()
+	var pause := world.get_node("PauseMenu") as PauseMenu
+	assert_false(pause._root.visible, "pausa nao abre por cima do level-up")
+	await wait_seconds(LevelUpScreen.INPUT_DELAY + 0.15)
+	_first_card(world.get_node("LevelUpScreen") as LevelUpScreen).pressed.emit()
+	await wait_process_frames(2)
+	assert_false(get_tree().paused)
+	Events.pause_requested.emit()
+	assert_true(pause._root.visible)
+	assert_true(get_tree().paused)
+	Events.pause_requested.emit()
+	assert_false(get_tree().paused)

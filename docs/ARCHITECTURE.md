@@ -1,68 +1,98 @@
 # Arquitetura
 
-## Visão geral
-```
-ui/main_menu.tscn ──Jogar──▶ game/world/world.tscn
-World (conta o tempo, começa/termina a partida)
-├─ Ground            chão (grade que segue o jogador)
-├─ Gems              GemSpawner: cria gema onde inimigo morre
-├─ EnemyManager      move TODOS os inimigos + reconstrói a SpatialGrid a cada frame
-├─ Player            movimento, vida, armas (filhas em Player/Weapons), câmera
-├─ Projectiles       camada dos projéteis (grupo "projectile_layer")
-├─ Effects           números de dano + partículas
-├─ EnemySpawner      lê a WaveTimeline e pede inimigos ao EnemyManager
-└─ Hud / LevelUpScreen / PauseMenu / GameOverScreen / DebugOverlay   (CanvasLayers)
-```
-A ordem importa: `EnemyManager` vem antes de `Player`/`Projectiles`, então a grade já está
-atualizada quando as armas procuram alvos.
+## Ideia central
+**Simulação no plano do chão (Vector2) + apresentação 3D.** Zumbis, projéteis e gemas são
+"agentes" de dados (sem nós), movidos em loops únicos e desenhados em lote com `MultiMesh`
+(`InstanceRenderer`). Isso permite hordas grandes no celular. `GroundPlane` converte
+`Vector2(x, y)` ↔ `Vector3(x, altura, y)` (1 unidade = 1 metro).
 
-## Autoloads (singletons)
+## Fluxo de telas (`SceneFlow`)
+```
+main_menu ─ JOGAR/RANQUEADO ─▶ run_setup_screen (Personagem › Mapa › Confirmar) ─▶ world
+          ├ PERSONAGENS/MAPAS ─▶ run_setup_screen (galeria)
+          ├ RANKING ─▶ ranking_screen     ├ CONQUISTAS ─▶ achievements_screen
+          └ CONFIGURAÇÕES ─▶ settings_screen (usa SettingsPanel, também usado na pausa)
+world ─ fim ─▶ ResultsScreen ─▶ jogar de novo / menu / ranking
+```
+`SceneFlow.go_to(caminho, params)` faz fade; a tela lê `SceneFlow.params`.
+
+## Cena da partida (`game/world/world.tscn`)
+```
+World            monta mapa + jogador de GameState.setup, conta tempo, encerra partida
+├ Map            recebe a cena do mapa (MapData.scene, raiz GameMap)
+├ EnemyManager   agentes de zumbi, SpatialGrid, contorno de obstáculos, comportamentos
+├ ProjectileManager  balas e arremessos (agentes + MultiMesh)
+├ PickupManager  gemas/moedas/baús (agentes + MultiMesh)
+├ Effects        números de dano, partículas, explosões, golpe (pools próprios)
+├ EnemySpawner   ondas (WaveTimeline) + DifficultyDirector + chefes + hordas
+├ CameraRig      câmera isométrica independente (zoom, tremor, foco)
+├ Player         (instanciado em runtime) CharacterBody3D + armas filhas
+└ Hud / LevelUpScreen / PauseMenu / ResultsScreen / DebugPanel / TutorialOverlay / DebugOverlay
+```
+A ordem importa: `EnemyManager` reconstrói a grade antes de armas/projéteis buscarem alvos.
+
+## Autoloads
 | Nome | Papel |
 |---|---|
-| `Events` | Barramento de sinais. Ex.: `enemy_killed`, `xp_collected`, `level_up`, `upgrade_chosen`, `player_contact`, `run_ended` |
-| `GameState` | Estado da partida: tempo, abates, `progression` (nível/XP), posição/raio do jogador, upgrades escolhidos, armas que tem |
-| `Pool` | `acquire(scene, parent)` / `release(node)`; nós liberados ficam escondidos e sem processar |
-| `Save` | Recordes em `user://save.json` |
-| `Audio` | `Audio.play(&"id")`; ids sem som ainda tocam silêncio (registrar em `SOUNDS`) |
+| `Config` | `data/config/game_config.tres` (cópia em runtime): duração 30 min, debug, multiplicadores, limite de zumbis, ouro, pontuação |
+| `Events` | Barramento de sinais (combate, progressão, avisos, partida) |
+| `Content` | Carrega personagens, mapas e conquistas de `data/` |
+| `Save` | Perfil (`ProfileData`) em JSON versionado, gravação segura (.tmp + .bak) |
+| `GameState` | Partida atual: setup, tempo, abates, XP, ouro, dano por arma, armas, **pausa compartilhada** |
+| `Pool` | Pooling genérico de nós (sobrou do protótipo; os agentes têm pools próprios) |
+| `Audio` | Buses Music/SFX, sons placeholder sintetizados, troca automática por arquivos em `assets/audio/` |
+| `Ranking` | Serviço de ranking; provider atual `LocalRankingProvider` (mock) |
+| `SceneFlow` | Navegação com fade + aviso "gire o celular" |
 
-## Fluxo de um abate
-`Projectile` acha inimigo pela `SpatialGrid` → `Enemy.take_damage()` → `Events.damage_dealt`
-(número de dano) → vida ≤ 0 → `Events.enemy_killed(pos, xp, cor)` → `GemSpawner` cria gema,
-`Effects` solta partículas, `GameState` conta abate → jogador encosta na gema →
-`Events.xp_collected` → `GameState.add_xp` → `Events.level_up` → `LevelUpScreen` pausa, sorteia
-(`UpgradePicker`) → `Events.upgrade_chosen` → `Player` aplica.
+## Dados (data-driven)
+| Pasta | Classe | Observação |
+|---|---|---|
+| `data/characters/` | `CharacterData` (extends `ContentData`) | stats, arma inicial, passiva, requisitos |
+| `data/maps/` | `MapData` | cena, timeline, perfil de dificuldade, duração (0 = Config) |
+| `data/maps/layouts/` | `CityLayout` | parâmetros do gerador de cidade (`CityMap`) |
+| `data/enemies/` | `EnemyData` | stats, comportamento (CHASE/EXPLODER/CHARGER), drops, cores |
+| `data/weapons/` | `WeaponData` | stats + `scene` (comportamento) |
+| `data/upgrades/` | `UpgradeData` | NEW_WEAPON, WEAPON_STAT, PLAYER_STAT, HEAL, EVOLVE, GOLD + requisitos |
+| `data/waves/` | `WaveTimeline` | QUAIS zumbis e o ritmo base |
+| `data/difficulty/` | `DifficultyProfile` | COMO a dificuldade cresce (vida, dano, velocidade, elites, chefes, hordas) |
+| `data/achievements/` | `AchievementData` | condição = `unlock_requirements` |
+| `data/config/` | `GameConfig` | parâmetros centrais |
 
-## Dano no jogador
-`EnemyManager` checa distância inimigo↔jogador e emite `Events.player_contact(dano)` (1x por
-frame, maior dano). `Player` usa `Health` (com invencibilidade curta) e emite `player_damaged`,
-`player_health_changed`, `camera_shake_requested` e, se morrer, `player_died` → `World` encerra.
+## Desbloqueios e progressão permanente
+- `UnlockRequirement` (base) + `SurviveRequirement` (map_id, seconds; **0 = duração do modo normal**),
+  `KillsRequirement`, `LevelRequirement`, `BossRequirement`, `AchievementRequirement`.
+- `ProgressService.finalize_run()` (puro, testado): ouro, pontuação, recordes, conquistas e
+  desbloqueios. Chamado pelo `World` no fim; depois `Save.save_data()`.
+- Conteúdo com `coming_soon = true` aparece como "EM BREVE".
 
-## Por que inimigos sem física?
-`CharacterBody2D`/`Area2D` com 300+ corpos colidindo entre si é caro no celular. Aqui cada
-inimigo é um `Node2D` + `Sprite2D`; o `EnemyManager` move todos num loop, a separação usa a
-`SpatialGrid` (metade dos inimigos por frame) e colisões são checagens de distância.
-Camadas de física nomeadas (player, enemy, player_projectile, pickup) ficam para uso futuro.
+## Dificuldade (normal e ranqueado)
+`DifficultyDirector` combina: vida, dano, velocidade (com teto), ritmo de spawn (com teto), chance
+de elite (zumbi dourado, 6x vida), chefes a cada `boss_interval` (rodízio, cada vez mais fortes) e
+hordas em anel. No ranqueado, depois do fim da timeline, `overtime_growth_mult` acelera tudo.
+`Config.game.max_active_enemies` limita zumbis vivos (performance).
 
-## Como adicionar...
-### Inimigo (só dados)
-1. Duplicar `data/enemies/basic.tres` → `data/enemies/<id>.tres`; mudar `id`, stats, `texture`, `color`.
-2. Colocar o novo recurso no array `enemies` de alguma onda em `data/waves/main_timeline.tres`.
-3. Rodar testes. (Comando: `/new-enemy`)
+## Mapa
+`GameMap` (base) expõe `grid` (`MapGrid`, obstáculos 1 m), `bounds` e `player_spawn`.
+`CityMap` gera a cidade a partir de um `CityLayout`: quarteirões, prédios (malhas juntadas por
+"pedaço" de 64 m), praças, carros/ônibus, barricadas, postes, entulho, orla com calçadão de ondas,
+quiosques, palmeiras, morro com comunidade, Cristo e Pão de Açúcar. Colisão do jogador: camada 5
+"world". Zumbis contornam obstáculos consultando a grade (custo O(1)).
 
-### Arma
-- **Com comportamento existente** (projétil/aura): duplicar `data/weapons/*.tres`, mudar `id` e stats,
-  e criar um upgrade `NEW_WEAPON` apontando para ela (senão ninguém consegue pegá-la).
-- **Comportamento novo**: criar `game/weapons/<nome>_weapon.gd` (`extends Weapon`, implementar
-  `attack()`), uma cena `.tscn` com esse script, e um `WeaponData` com `scene` apontando para ela.
-  Stats que upgrades mudam devem ser variáveis da classe (`damage`, `cooldown`, `area`...). (Comando: `/new-weapon`)
-
-### Upgrade (só dados)
-Criar `data/upgrades/<id>.tres` (`UpgradeData`): `kind` = NEW_WEAPON | WEAPON_STAT | PLAYER_STAT | HEAL,
-`stat` (nome da variável: ex. `damage`, `move_speed`, `cooldown_mult`), `value`, `is_multiplier`,
-`max_picks`, `weight`. O jogo carrega a pasta inteira sozinho. (Comando: `/new-upgrade`)
+## Como adicionar…
+- **Zumbi**: novo `.tres` em `data/enemies/` + incluir em ondas de `data/waves/*.tres`.
+  Comportamento novo = novo valor em `EnemyData.Behavior` + caso no `EnemyManager`. (`/new-enemy`)
+- **Arma**: comportamento existente (projétil/corpo a corpo/arremesso/aura) = só `.tres` + upgrade
+  `NEW_WEAPON`. Novo comportamento = `extends Weapon` + `attack()` + cena. (`/new-weapon`)
+- **Upgrade/passiva/evolução**: `.tres` em `data/upgrades/` (stat pelo nome). (`/new-upgrade`)
+- **Personagem**: `.tres` em `data/characters/` (requisitos opcionais). Modelo: `model_scene`.
+- **Mapa**: `.tres` em `data/maps/` + cena com raiz `GameMap` (ou `CityMap` + novo `CityLayout`).
+- **Conquista**: `.tres` em `data/achievements/` com requisitos.
+- **Som**: arquivo `assets/audio/<id>.ogg|wav` (ids em `autoload/audio.gd`).
+- **Ranking online**: classe que estende `RankingProvider`, trocar em `autoload/ranking.gd`.
 
 ## Convenções
 - Tipagem estática obrigatória; `class_name` em classes reutilizáveis.
-- Nós de pool implementam `setup(...)` para reiniciar estado (opcional `on_acquire/on_release`).
-- `SpatialGrid` usa `position`: itens precisam ser filhos de nós na origem do mundo.
-- Ambiente: Godot em `tools/godot/` em modo autocontido (`._sc_`), templates em `tools/godot/editor_data/`.
+- Lógica testável em classes puras (`RefCounted`): `ProgressService`, `DifficultyDirector`,
+  `UpgradePicker`, `Health`, `Progression`, `SpatialGrid`, `MapGrid`.
+- Telas que funcionam com o jogo pausado: `process_mode = ALWAYS` e `GameState.request_pause(self)`.
+- Testes usam save separado (`Save.set_storage_path`) para não mexer no progresso real.

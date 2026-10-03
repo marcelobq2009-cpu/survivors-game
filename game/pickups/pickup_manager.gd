@@ -10,6 +10,7 @@ const MAX_GEMS := 300
 const COLLECT_DISTANCE := 0.6
 const START_SPEED := 4.0
 const ACCELERATION := 40.0
+const CHEST_HEAL := 25.0
 
 enum Kind { GEM, COIN, CHEST }
 
@@ -74,6 +75,18 @@ func spawn(kind: int, pos: Vector2, value: int) -> void:
 		_gem_count += 1
 
 
+## Posicao da gema/moeda/bau mais proxima (ou Vector2.INF). Usado pelo robo de playtest.
+func nearest_pickup(pos: Vector2, max_dist: float) -> Vector2:
+	var best := Vector2.INF
+	var best_d := max_dist
+	for p: Pickup in _items:
+		var d := p.pos.distance_to(pos)
+		if d < best_d:
+			best_d = d
+			best = p.pos
+	return best
+
+
 ## Puxa todas as gemas e moedas para o jogador (ima total / debug).
 func vacuum_all() -> void:
 	for p: Pickup in _items:
@@ -135,6 +148,7 @@ func _collect(p: Pickup) -> void:
 		Kind.CHEST:
 			Events.gold_collected.emit(maxi(1, roundi(p.value * GameState.gold_mult)))
 			Events.chest_opened.emit()
+			Events.player_healed.emit(CHEST_HEAL)
 			Audio.play(&"chest", -4.0)
 
 

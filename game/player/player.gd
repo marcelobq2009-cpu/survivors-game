@@ -48,8 +48,11 @@ func _ready() -> void:
 	_sync_state()
 	Events.player_contact.connect(_on_player_contact)
 	Events.upgrade_chosen.connect(_on_upgrade_chosen)
+	Events.player_healed.connect(func(amount: float) -> void:
+		health.heal(amount)
+		Events.player_health_changed.emit(health.current, health.max_value))
 	if character.starting_weapon:
-		add_weapon(character.starting_weapon)
+		add_weapon(character.starting_weapon, false)
 	Events.player_health_changed.emit(health.current, health.max_value)
 
 
@@ -91,7 +94,7 @@ func _physics_process(delta: float) -> void:
 	_sync_state()
 
 
-func add_weapon(weapon_data: WeaponData) -> void:
+func add_weapon(weapon_data: WeaponData, announce: bool = true) -> void:
 	if weapons.has(weapon_data.id) or weapon_data.scene == null:
 		return
 	var weapon := weapon_data.scene.instantiate() as Weapon
@@ -101,6 +104,8 @@ func add_weapon(weapon_data: WeaponData) -> void:
 	GameState.owned_weapons.append(weapon_data.id)
 	GameState.weapon_levels[weapon_data.id] = 1
 	Events.weapons_changed.emit()
+	if announce:
+		Events.announcement.emit("NOVA ARMA: %s" % weapon_data.display_name.to_upper(), Color(0.55, 1, 0.5))
 
 
 ## Troca uma arma pela evolucao dela (mantem os bonus de stats ja ganhos).
@@ -112,7 +117,7 @@ func evolve_weapon(from: WeaponData, to: WeaponData) -> void:
 	weapons.erase(from.id)
 	GameState.owned_weapons.erase(from.id)
 	old.queue_free()
-	add_weapon(to)
+	add_weapon(to, false)
 	GameState.weapon_levels[to.id] = level + 1
 	Events.announcement.emit("ARMA EVOLUIU: %s" % to.display_name.to_upper(), Color(1, 0.85, 0.3))
 

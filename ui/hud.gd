@@ -65,7 +65,6 @@ func _ready() -> void:
 	Events.player_health_changed.connect(_on_health_changed)
 	Events.weapons_changed.connect(_refresh_weapons)
 	Events.announcement.connect(_queue_announcement)
-	Events.level_up.connect(func(l: int) -> void: _queue_announcement("NÍVEL %d!" % l, UiKit.TOXIC))
 	Events.gold_collected.connect(func(_g: int) -> void: _pulse(_gold_label))
 	_mode_label.text = "RANQUEADO" if GameState.setup.is_ranked() else ""
 

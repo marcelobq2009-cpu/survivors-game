@@ -1,52 +1,51 @@
-# Survivors Game — guia rápido para o Claude
+# Apocalipse Brasil — guia rápido para o Claude
 
-Jogo survivors-like (estilo Vampire Survivors) em **Godot 4.7.2 / GDScript**, para celular em retrato
-(720x1280), testado no PC e na web. Tema ainda **não definido**: arte placeholder geométrica e
-nomes genéricos (`Enemy`, `Weapon`...). O dono é iniciante em Godot: explique em português simples.
+Survivor-like de apocalipse zumbi no Brasil (Capítulo 1: Rio de Janeiro) em **Godot 4.7.2 / GDScript**.
+**3D com câmera isométrica**, celular em **paisagem** (1280x720), testado no PC e na web.
+Arte placeholder 3D gerada por código. O dono é iniciante em Godot: explique em português simples.
 
 ## Idioma
-- Código, nomes de arquivos/classes: **inglês**. Comentários, docs, commits e respostas: **português (BR)**.
+- Código, arquivos, classes: **inglês**. Comentários, docs, commits, respostas e textos do jogo: **português (BR)**.
 
 ## Comandos (Windows: `.ps1` | Linux/nuvem/CI: `.sh`)
 - Testes: `.\scripts\test.ps1` | `./scripts/test.sh` (GUT headless; um arquivo: `-gtest=res://tests/x.gd`)
 - Rodar no PC: `.\scripts\run.ps1` (menu) ou `.\scripts\run.ps1 res://game/world/world.tscn`
 - Build web: `.\scripts\build-web.ps1` | `./scripts/build-web.sh` → `build/web/`
-- Godot direto: `scripts/godot.(ps1|sh) <args>` (binário local em `tools/godot/`)
+- Robô de playtest: `scripts/godot.(ps1|sh) --headless res://tests/perf/playtest_bot.tscn --fixed-fps 60 -- minutes=10`
 - Estresse/perf: `scripts/godot.(ps1|sh) --headless res://tests/perf/stress.tscn --fixed-fps 60`
 - Publicar: push na `main` → GitHub Actions testa e publica em https://marcelobq2009-cpu.github.io/survivors-game/
 
 ## Mapa de pastas
-- `autoload/` singletons: `Events` (sinais), `GameState` (estado da partida), `Pool`, `Save`, `Audio`
-- `game/player/` jogador, vida (`Health`), stats, XP (`Progression`, `XpCurve`)
-- `game/enemies/` inimigo, `EnemyManager` (move todos + grade), spawner, classes de ondas
-- `game/weapons/` `Weapon` base, `ProjectileWeapon`, `AuraWeapon`, projétil
-- `game/pickups/` gemas de XP | `game/upgrades/` `UpgradeData`, sorteio, aplicação de stats
-- `game/world/` cena da partida, câmera, chão, efeitos, `SpatialGrid`
-- `ui/` HUD, joystick, level-up, pausa, game over, menu, debug, tema (`main_theme.tres`)
-- `data/` **todos os números do jogo** em `.tres`: enemies/, weapons/, upgrades/, waves/, player/
-- `tests/` testes GUT (`test_*.gd`) + `tests/perf/` | `scripts/` terminal | `docs/` documentação
+- `autoload/` Config, Events, Content, Save, GameState, Pool, Audio, Ranking, SceneFlow
+- `game/meta/` personagens, mapas, conquistas, requisitos de desbloqueio, perfil/save, ranking, ProgressService
+- `game/maps/` GameMap, MapGrid (obstáculos), CityMap (gerador de cidade), cenas dos mapas
+- `game/player/` Player 3D, Health, PlayerStats, Progression/XpCurve
+- `game/enemies/` EnemyAgent, EnemyManager (loop + MultiMesh), spawner, DifficultyDirector, ondas
+- `game/weapons/` Weapon base + projétil/corpo a corpo/arremesso/aura, ProjectileManager
+- `game/pickups/` PickupManager (gemas, ouro, baú) | `game/upgrades/` UpgradeData, sorteio
+- `game/world/` World, CameraRig, Effects, InstanceRenderer, PlaceholderMeshes, SpatialGrid
+- `ui/` menus (UiScreen/UiKit), HUD, level-up, pausa, resultado, debug, tutorial, joystick
+- `data/` **todos os números do jogo** em `.tres` (characters, maps, enemies, weapons, upgrades, waves, difficulty, achievements, config)
+- `tests/` GUT (`test_*.gd`) + `tests/perf/` (robô e estresse) | `scripts/` | `docs/`
 
 ## Regras de arquitetura
-- **Data-driven**: stats ficam em `.tres` (`data/`). Inimigo/arma/upgrade novo = novo `.tres`;
-  código novo só para comportamento novo.
-- **Sinais via `Events`**: sistemas não guardam referência uns dos outros; leem `GameState`.
-- **Tipagem estática em tudo** (variável sem tipo = erro de compilação). `class_name` nas classes base.
-- **Pooling**: inimigos, projéteis, gemas e efeitos vêm de `Pool.acquire()`/`Pool.release()`; nunca `queue_free` neles.
-- **Performance mobile**: inimigos são `Node2D` sem física; colisão/alvos via `SpatialGrid` (usa `position`,
-  os pais ficam na origem). Nada de `_process` por inimigo: o `EnemyManager` faz o loop.
-- Lógica testável fica em classes puras (`RefCounted`) separadas dos nós.
+- **Simulação no chão (Vector2) + visual 3D**: zumbis/projéteis/gemas são agentes de dados desenhados com MultiMesh.
+- **Data-driven**: conteúdo novo = novo `.tres`; código só para comportamento novo. Nada de números mágicos: use `Config.game`.
+- **Sinais via `Events`**; estado da partida em `GameState`; progresso permanente em `Save.profile`.
+- **Tipagem estática em tudo** (variável sem tipo = erro). `class_name` nas classes base.
+- **Pausa**: use `GameState.request_pause(self)` / `release_pause(self)` (várias telas pausam juntas).
+- Lógica testável em classes puras (`RefCounted`). Testes que salvam usam `Save.set_storage_path(...)`.
 
 ## Regras de trabalho (economizar tokens)
 - Leia **só** os arquivos ligados ao pedido. Use Grep/Glob antes de abrir arquivos grandes.
 - **Nunca** leia: `.godot/`, `addons/`, `assets/` (binários), `build/`, `tools/`, `*.import`, `*.uid`.
-- Não edite `.tscn`/`.tres` à mão se der para gerar/ajustar de forma segura; mantenha o formato do Godot.
-- Ao terminar uma tarefa: rode os testes, faça commit pequeno em português e **atualize `docs/PROGRESS.md`**.
-- Mudou regra/sistema? Atualize o doc correspondente (curto).
-- Asset externo novo? Registre em `assets/CREDITS.md`.
+- Prefira gerar/ajustar `.tres`/`.tscn` mantendo o formato do Godot (veja um arquivo vizinho como modelo).
+- Ao terminar: rode os testes, commit pequeno em português e **atualize `docs/PROGRESS.md`**.
+- Mudou sistema? Atualize `docs/ARCHITECTURE.md` (curto). Asset externo? `assets/CREDITS.md`.
 
 ## Onde ler mais (não copie para cá)
-- Design do jogo, loop e ideias: `docs/GDD.md`
-- Como os sistemas conversam / como adicionar inimigo, arma, upgrade: `docs/ARCHITECTURE.md`
+- Design, conteúdo e modos: `docs/GDD.md`
+- Sistemas e "como adicionar inimigo/arma/upgrade/personagem/mapa": `docs/ARCHITECTURE.md`
 - Onde paramos, pendências e bugs: `docs/PROGRESS.md`
 - Celular (web hoje; Android/iOS no futuro): `docs/MOBILE.md`
 

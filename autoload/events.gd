@@ -15,6 +15,7 @@ signal pause_requested  ## Ex.: botao de pausa do HUD (toque).
 signal player_contact(damage: float)  ## Um zumbi encostou (ou explodiu) no jogador.
 signal player_damaged(amount: float)
 signal player_health_changed(current: float, max_value: float)
+signal player_healed(amount: float)  ## Ex.: bau.
 signal player_died
 
 # --- Combate ---

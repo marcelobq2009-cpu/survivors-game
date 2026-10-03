@@ -11,7 +11,7 @@ script = ExtResource("5_2dbuk")
 
 [resource]
 script = ExtResource("2_oiaef")
-pickup_radius = 3.2
+pickup_radius = 3.8
 regen = 0.8
 starting_weapon = ExtResource("3_fbn6o")
 passive_name = "Plantão"

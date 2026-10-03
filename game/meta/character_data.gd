@@ -14,10 +14,10 @@ extends ContentData
 ## Metros por segundo.
 @export var move_speed: float = 4.5
 ## Raio do ima de XP em metros.
-@export var pickup_radius: float = 2.5
+@export var pickup_radius: float = 3.0
 ## Raio de colisao com zumbis (metros).
 @export var radius: float = 0.4
-@export var invincibility_time: float = 0.5
+@export var invincibility_time: float = 0.6
 ## Dano recebido e reduzido nesta quantidade (minimo 1).
 @export var armor: float = 0.0
 ## Vida recuperada por segundo.

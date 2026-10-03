@@ -35,7 +35,7 @@ func build() -> void:
 	_rng.seed = layout.seed
 	var he := layout.half_extents
 	bounds = Rect2(-he.x, -he.y, he.x * 2.0, he.y * 2.0)
-	grid = MapGrid.new(bounds, 1.0)
+	grid = MapGrid.new(bounds, 0.5)
 	_ground = PlaceholderMeshes.begin()
 	_scenery = PlaceholderMeshes.begin()
 	_obstacles = StaticBody3D.new()
@@ -173,7 +173,7 @@ func _build_building(lot: Rect2) -> void:
 		PlaceholderMeshes.add_box(st, Vector3(1.4, 1.2, 1.4),
 				Vector3(c2.x + w * 0.2, h + 0.95, c2.y - d * 0.2), Color(0.2, 0.4, 0.75))
 	_add_collision(c2, Vector3(w, h, d), 0.0)
-	grid.block_rect(c2, Vector2(w, d), 0.0, 0.3)
+	grid.block_rect(c2, Vector2(w, d), 0.0, 0.05)
 	if destroyed:
 		for i: int in 3:
 			var p := c2 + Vector2(_rng.randf_range(-0.6, 0.6) * w, (d * 0.5 + 1.2) * (1 if _rng.randf() < 0.5 else -1))
@@ -234,7 +234,7 @@ func _add_car(pos: Vector2, rot: float) -> void:
 	_cars.append(Transform3D(Basis(Vector3.UP, rot), GroundPlane.to_3d(pos)))
 	_car_colors.append(CAR_COLORS[_rng.randi_range(0, CAR_COLORS.size() - 1)])
 	_add_collision(pos, Vector3(1.8, 1.4, 4.2), rot)
-	grid.block_rect(pos, Vector2(1.8, 4.2), rot, 0.2)
+	grid.block_rect(pos, Vector2(1.8, 4.2), rot, 0.05)
 
 
 func _add_bus(pos: Vector2, rot: float) -> void:
@@ -245,7 +245,7 @@ func _add_bus(pos: Vector2, rot: float) -> void:
 	var st := _chunk_tool(pos)
 	st.append_from(mesh, 0, xf)
 	_add_collision(pos, Vector3(2.5, 3.0, 11.0), rot)
-	grid.block_rect(pos, Vector2(2.5, 11.0), rot, 0.2)
+	grid.block_rect(pos, Vector2(2.5, 11.0), rot, 0.05)
 
 
 # --- Orla (praia ao sul) -------------------------------------------------------
@@ -298,7 +298,7 @@ func _build_beach() -> void:
 		PlaceholderMeshes.add_box(st, Vector3(3.0, 2.6, 3.0), GroundPlane.to_3d(kp, 1.3), Color(0.95, 0.95, 0.9))
 		PlaceholderMeshes.add_box(st, Vector3(4.2, 0.3, 4.2), GroundPlane.to_3d(kp, 2.75), Color(0.9, 0.35, 0.2))
 		_add_collision(kp, Vector3(3.0, 2.6, 3.0), 0.0)
-		grid.block_rect(kp, Vector2(3.0, 3.0), 0.0, 0.3)
+		grid.block_rect(kp, Vector2(3.0, 3.0), 0.0, 0.05)
 		x += 38.0 + _rng.randf_range(-6, 6)
 
 
@@ -400,7 +400,7 @@ func _add_prop(kind: String, pos: Vector2, rot: float, scale: float, footprint: 
 	if footprint != Vector2.ZERO:
 		if grid.is_blocked(pos):
 			return
-		grid.block_rect(pos, footprint * scale, rot, 0.1)
+		grid.block_rect(pos, footprint * scale, rot, 0.0)
 		_add_collision(pos, Vector3(footprint.x * scale, 1.5, footprint.y * scale), rot)
 	if not _props.has(kind):
 		_props[kind] = [] as Array[Transform3D]

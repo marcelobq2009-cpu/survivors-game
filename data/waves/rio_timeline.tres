@@ -11,72 +11,73 @@
 [sub_resource type="Resource" id="Resource_dy87s"]
 script = ExtResource("2_efr37")
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh")])
-spawn_interval = 1.2
-spawn_count = 3
-max_alive = 40
+spawn_interval = 2.0
+spawn_count = 2
+max_alive = 20
 
 [sub_resource type="Resource" id="Resource_lmhcj"]
 script = ExtResource("2_efr37")
 start_time = 60.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("4_re5hh"), ExtResource("5_bcycs")])
-spawn_count = 4
-max_alive = 60
+spawn_interval = 2.0
+spawn_count = 3
+max_alive = 35
 
 [sub_resource type="Resource" id="Resource_6rr35"]
 script = ExtResource("2_efr37")
 start_time = 180.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("5_bcycs")])
-spawn_interval = 0.9
-spawn_count = 5
-max_alive = 90
+spawn_interval = 1.4
+spawn_count = 4
+max_alive = 55
 
 [sub_resource type="Resource" id="Resource_467ms"]
 script = ExtResource("2_efr37")
 start_time = 300.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("6_5uka0")])
-spawn_interval = 0.9
-spawn_count = 6
-max_alive = 120
+spawn_interval = 1.3
+spawn_count = 5
+max_alive = 80
 
 [sub_resource type="Resource" id="Resource_juugj"]
 script = ExtResource("2_efr37")
 start_time = 480.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
-spawn_interval = 0.8
-spawn_count = 7
-max_alive = 150
+spawn_interval = 1.2
+spawn_count = 6
+max_alive = 110
 
 [sub_resource type="Resource" id="Resource_qbpjc"]
 script = ExtResource("2_efr37")
 start_time = 720.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
-spawn_interval = 0.75
-spawn_count = 8
-max_alive = 190
+spawn_interval = 1.1
+spawn_count = 7
+max_alive = 150
 
 [sub_resource type="Resource" id="Resource_ie2up"]
 script = ExtResource("2_efr37")
 start_time = 960.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0"), ExtResource("4_re5hh")])
-spawn_interval = 0.7
-spawn_count = 9
-max_alive = 230
+spawn_interval = 1.0
+spawn_count = 8
+max_alive = 190
 
 [sub_resource type="Resource" id="Resource_rvdjm"]
 script = ExtResource("2_efr37")
 start_time = 1200.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("5_bcycs"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
-spawn_interval = 0.65
-spawn_count = 10
-max_alive = 270
+spawn_interval = 0.9
+spawn_count = 9
+max_alive = 230
 
 [sub_resource type="Resource" id="Resource_6fqvq"]
 script = ExtResource("2_efr37")
 start_time = 1500.0
 enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0"), ExtResource("6_5uka0")])
-spawn_interval = 0.6
-spawn_count = 12
-max_alive = 310
+spawn_interval = 0.8
+spawn_count = 10
+max_alive = 270
 
 [resource]
 script = ExtResource("1_odckx")

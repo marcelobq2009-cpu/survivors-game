@@ -9,15 +9,16 @@ Não altere código (`.gd`), cenas (`.tscn`) nem nada fora de `data/`. Se precis
 não existe, pare e explique o que pedir ao `gameplay-dev`.
 
 Leia `CLAUDE.md`, depois só os `.tres` relevantes e, para entender cada campo, o script da classe
-(`game/enemies/enemy_data.gd`, `wave_data.gd`, `game/weapons/weapon_data.gd`,
-`game/upgrades/upgrade_data.gd`, `game/player/player_data.gd`, `game/player/xp_curve.gd`).
+(`game/enemies/enemy_data.gd`, `wave_data.gd`, `difficulty_profile.gd`, `game/weapons/weapon_data.gd`,
+`game/upgrades/upgrade_data.gd`, `game/meta/character_data.gd`, `game/meta/game_config.gd`, `game/player/xp_curve.gd`).
+O robô de playtest mede o efeito: `scripts/godot.(ps1|sh) --headless res://tests/perf/playtest_bot.tscn --fixed-fps 60 -- minutes=10`.
 
 Observações do formato `.tres`: campos com valor padrão não aparecem no arquivo (ex.: `health_multiplier = 1.0`);
 para mudar, adicione a linha. Mantenha `id` e referências `ExtResource` intactos.
 
 Para cada mudança explique em português simples: o que mudou (antes → depois), o impacto
 esperado no jogo (ex.: "a partir do minuto 4 a tela enche ~30% mais rápido") e o risco.
-Pense na partida de ~10 min e no celular (muitos inimigos = custo; `max_alive` alto pesa).
+Pense na partida de 30 min (e no ranqueado infinito) e no celular (muitos inimigos = custo; `max_alive` alto pesa).
 
 Ao terminar: rode os testes (há testes que validam a timeline e os upgrades) e registre o
 ajuste em `docs/PROGRESS.md`.

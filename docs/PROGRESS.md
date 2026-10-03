@@ -1,29 +1,39 @@
 # Progresso
 
-_Última atualização: 2026-10-02_
+_Última atualização: 2026-10-03_
 
-## Pronto
-- Ambiente: Godot 4.7.2 local (`tools/godot/`), GUT 9.7.1, scripts `test`/`run`/`build-web` (ps1 + sh).
-- Projeto: retrato 720x1280, Compatibility, inputs, camadas, tipagem estática obrigatória.
-- Arquitetura: autoloads `Events`/`GameState`/`Pool`/`Save`/`Audio`, `SpatialGrid`, dados em `.tres`.
-- Protótipo jogável: jogador + joystick flutuante, 3 inimigos, 10 ondas (10 min), projétil + aura,
-  gemas de XP com ímã, level-up com 3 cartas (14 upgrades), HUD, menu, pausa, game over/vitória,
-  juice (flash, números, tremor, partículas), overlay de debug (F3 / 3 dedos).
-- 41 testes GUT (XP, vida, stats, sorteio, ondas, pool, grade, integração da partida).
-- Web: preset sem threads; GitHub Actions testa e publica no Pages a cada push na `main`.
-- Menu mostra versão + hash do commit. Hook `SessionStart` para sessões na nuvem.
-- Cache-busting: `index.pck?v=<commit>` no `index.html` (Pages tem cache de 10 min).
-- Contexto para o Claude: `CLAUDE.md`, docs, subagentes e comandos.
+## Pronto (v0.2.0 — primeira versão jogável do tema)
+- **Tema**: apocalipse zumbi no Brasil, Capítulo 1 Rio de Janeiro. Nome provisório "Apocalipse Brasil".
+- **3D isométrico** em paisagem: CameraRig (zoom, tremor, foco, independente do jogador),
+  Rio gerado por código (prédios com caixa d'água, praças, carros/ônibus, barricadas, orla com
+  calçadão de ondas, quiosques, palmeiras, morro com comunidade, Cristo, Pão de Açúcar).
+- **Hordas**: zumbis como agentes de dados + MultiMesh; contornam prédios pela grade do mapa;
+  4 tipos (Comum, Corredor, Brutamontes, Inchado explosivo), elites dourados, 2 chefes com investida.
+- **Combate**: 6 armas (Pistola, Espingarda, Metralhadora, Facão, Molotov, Gás) + evolução
+  (Pistola Rajada); crítico, armadura, regeneração; ~35 cartas de upgrade com builds.
+- **Progressão**: XP/nível, baús, ouro; modo Normal 30 min; Ranqueado infinito com DifficultyDirector
+  (vida, dano, velocidade, elites, chefes a cada 5 min, hordas, overtime).
+- **Meta**: personagens (Sobrevivente, Militar, Médica), mapas (Rio, São Paulo, Salvador em breve),
+  desbloqueios por requisitos, 5 conquistas, save local versionado, ranking mock com camada de API.
+- **Interface**: menu, seleção Personagem › Mapa › Confirmar, galerias, ranking, conquistas,
+  configurações (áudio, idioma, qualidade, vibração, notificações, restaurar), HUD, level-up,
+  pausa (continuar/configurações/reiniciar/sair), resultado, tutorial da 1ª partida, aviso "gire o celular".
+- **Feedback**: flash de dano, números (crítico amarelo), partículas, explosões, golpe, anel de
+  level-up, avisos (chefe/horda/nova arma/último minuto), zoom no chefe, câmera lenta no fim,
+  sons placeholder sintetizados.
+- **Debug**: painel DBG (tempo, XP, ouro, zumbis, chefe, horda, matar todos, invencível,
+  dificuldade, teleporte, ímã, baú, desbloquear, vencer), partidas curtas (Configurações), overlay F3/3 dedos.
+- **Testes**: ~85 testes GUT + robô de playtest + teste de estresse.
 
 ## Falta / próximos passos
-1. **Definir o tema** (ver `docs/GDD.md`) e trocar arte/textos.
-2. Medir FPS num celular real no minuto 8–10 (overlay 3 dedos) e ajustar se < 60.
-3. Sons reais (pontos já existem em `autoload/audio.gd`).
-4. Balancear com partidas reais (agente `balance-designer`).
-5. Mais conteúdo: armas, inimigos, chefe/baú.
+1. Testar no celular real (FPS no minuto 20+, conforto do joystick, legibilidade).
+2. Arte 3D e sons definitivos (trocar mesh/model_scene/arquivos de áudio).
+3. Balancear com partidas reais (agente `balance-designer` + robô de playtest).
+4. Habilidade ativa dos personagens (campos já existem em `CharacterData`).
+5. Uso do ouro (melhorias permanentes/loja) e ranking online (provider HTTP).
 
 ## Bugs / riscos conhecidos
-- Performance no celular ainda **não medida** (PC: ~1,3 ms/frame para 400 inimigos no `EnemyManager`).
-- Hook da nuvem ainda não testado numa sessão remota real.
-- Textos da UI sem acentos (ex.: "Nivel", "Voce sobreviveu!").
-- Gemas não se fundem: muitas gemas paradas longe do jogador podem acumular no fim da partida.
+- Música: só há pontos de música; sem arquivos, fica em silêncio.
+- Idioma: só Português (Inglês aparece como "em breve").
+- Zumbis contornam prédios por "deslizamento" (não é pathfinding completo): em becos podem enroscar.
+- iPhone (Safari) não permite travar a tela em paisagem: o jogador precisa girar o aparelho.
