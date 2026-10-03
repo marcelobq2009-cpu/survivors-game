@@ -43,7 +43,14 @@ func load_data() -> void:
 	if data.is_empty():
 		data = _read(_path + ".bak")  # Arquivo principal ausente/corrompido.
 	profile = _migrate(data)
+	apply_runtime_settings()
 	profile_changed.emit()
+
+
+## Aplica preferencias que mudam regras em tempo de execucao (debug).
+func apply_runtime_settings() -> void:
+	Config.game.use_debug_match_duration = profile.settings.debug_short_match \
+			and Config.game.debug_tools_enabled()
 
 
 ## Apaga todo o progresso (usado pelo debug / "restaurar").

@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_5mvvu")
 id = &"pistol_rate"
-title = "Pistola: +Cadencia"
-description = "Atira 15% mais rapido."
+title = "Pistola: +Cadência"
+description = "Atira 15% mais rápido."
 kind = 1
 weapon = ExtResource("2_46rop")
 stat = &"cooldown"

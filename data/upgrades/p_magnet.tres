@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_uq2k7")
 id = &"p_magnet"
-title = "Ima"
+title = "Ímã"
 description = "Coleta XP e ouro de mais longe."
 stat = &"pickup_radius"
 value = 1.0

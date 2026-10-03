@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_b7vfn")
 id = &"gas_area"
-title = "Gas: +Area"
+title = "Gás: +Área"
 description = "Nuvem 15% maior."
 kind = 1
 weapon = ExtResource("2_sk620")

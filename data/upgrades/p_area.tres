@@ -6,7 +6,7 @@
 script = ExtResource("1_7movj")
 id = &"p_area"
 title = "Explosivos Caseiros"
-description = "+12% de area em tudo."
+description = "+12% de área em tudo."
 stat = &"area_mult"
 value = 0.12
 tag = &"area"

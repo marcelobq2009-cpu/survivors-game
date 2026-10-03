@@ -7,7 +7,7 @@
 script = ExtResource("1_hti5r")
 id = &"unlock_smg"
 title = "Nova arma: Metralhadora"
-description = "Rajada rapida e imprecisa."
+description = "Rajada rápida e imprecisa."
 kind = 0
 weapon = ExtResource("2_wk4ds")
 max_picks = 1

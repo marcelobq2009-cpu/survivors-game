@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_eqknv")
 id = &"gas"
-display_name = "Gas Lacrimogeneo"
+display_name = "Gás Lacrimogêneo"
 description = "Nuvem que fere tudo ao seu redor."
 scene = ExtResource("1_ojejw")
 color = Color(0.75, 1, 0.6, 1)

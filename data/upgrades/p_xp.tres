@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_j3xot")
 id = &"p_xp"
-title = "Estudo de Sobrevivencia"
+title = "Estudo de Sobrevivência"
 description = "+10% de XP."
 stat = &"xp_mult"
 value = 0.1

@@ -7,7 +7,7 @@
 script = ExtResource("2_o8lbu")
 id = &"pistol"
 display_name = "Pistola"
-description = "Atira no zumbi mais proximo."
+description = "Atira no zumbi mais próximo."
 scene = ExtResource("1_a40w6")
 color = Color(1, 0.9, 0.45, 1)
 damage = 9.0

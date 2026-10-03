@@ -7,7 +7,7 @@
 script = ExtResource("2_iormu")
 id = &"molotov"
 display_name = "Molotov"
-description = "Explode em area onde cai."
+description = "Explode em área onde cai."
 scene = ExtResource("1_su50w")
 color = Color(1, 0.45, 0.15, 1)
 damage = 18.0

@@ -7,8 +7,8 @@
 [resource]
 script = ExtResource("2_rdg1l")
 id = &"evolve_pistol"
-title = "EVOLUCAO: Pistola Rajada"
-description = "Pistola Nv.5 + Mira Treinada: rajadas que atravessam."
+title = "EVOLUÇÃO: Pistola Rajada"
+description = "Pistola Nv. 5 + Mira Treinada: rajadas que atravessam."
 kind = 4
 weapon = ExtResource("3_dmacl")
 max_picks = 1

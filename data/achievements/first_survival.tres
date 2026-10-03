@@ -12,7 +12,7 @@ seconds = 300.0
 [resource]
 script = ExtResource("1_u3bn3")
 id = &"first_survival"
-display_name = "Primeira Sobrevivencia"
+display_name = "Primeira Sobrevivência"
 description = "Sobreviva 5 minutos no Rio."
 color = Color(1, 0.82, 0.3, 1)
 unlock_requirements = Array[ExtResource("2_wanku")]([SubResource("Resource_rq3sj")])

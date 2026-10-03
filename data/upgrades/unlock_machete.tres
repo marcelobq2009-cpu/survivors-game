@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_x6ilp")
 id = &"unlock_machete"
-title = "Nova arma: Facao"
+title = "Nova arma: Facão"
 description = "Golpe em arco na sua frente."
 kind = 0
 weapon = ExtResource("2_lh75j")

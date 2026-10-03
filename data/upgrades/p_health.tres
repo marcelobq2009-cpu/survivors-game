@@ -6,7 +6,7 @@
 script = ExtResource("1_3snp1")
 id = &"p_health"
 title = "Colete"
-description = "+25 de vida maxima."
+description = "+25 de vida máxima."
 stat = &"max_health"
 value = 25.0
 tag = &"defesa"

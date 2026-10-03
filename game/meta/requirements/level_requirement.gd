@@ -14,4 +14,4 @@ func progress(profile: ProfileData) -> float:
 
 
 func describe() -> String:
-	return "Alcance o nivel %d numa partida" % level
+	return "Alcance o nível %d numa partida" % level

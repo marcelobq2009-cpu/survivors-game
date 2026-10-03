@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_2yoec")
 id = &"machete"
-display_name = "Facao"
+display_name = "Facão"
 description = "Golpe em arco na sua frente."
 scene = ExtResource("1_x78oe")
 color = Color(0.85, 0.95, 1, 1)

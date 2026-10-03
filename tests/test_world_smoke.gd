@@ -9,6 +9,7 @@ var world: World
 func before_all() -> void:
 	Save.set_storage_path("user://test_save.json")
 	Save.reset_progress()
+	Save.profile.tutorial_done = true  # tutorial pausaria o jogo nos testes
 	# O jogo pausa a arvore (level-up, fim). O GUT precisa continuar rodando.
 	get_tree().root.process_mode = Node.PROCESS_MODE_ALWAYS
 

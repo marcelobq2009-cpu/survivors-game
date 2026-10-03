@@ -7,7 +7,7 @@
 script = ExtResource("1_7lgcq")
 id = &"unlock_pistol"
 title = "Nova arma: Pistola"
-description = "Atira no zumbi mais proximo."
+description = "Atira no zumbi mais próximo."
 kind = 0
 weapon = ExtResource("2_24rqu")
 max_picks = 1

@@ -7,6 +7,7 @@ extends Node3D
 
 const PLAYER_SCENE: PackedScene = preload("res://game/player/player.tscn")
 const END_DELAY := 1.4  # segundos de "camera lenta" antes do resultado
+const GROUP := &"world"
 
 var _duration: float = 0.0
 var _last_minute_warned: bool = false
@@ -17,6 +18,14 @@ var _ending: bool = false
 @onready var spawner: EnemySpawner = $EnemySpawner
 
 
+func _enter_tree() -> void:
+	add_to_group(GROUP)
+
+
+static func find(tree: SceneTree) -> World:
+	return tree.get_first_node_in_group(GROUP) as World
+
+
 func _ready() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -24,6 +33,8 @@ func _ready() -> void:
 	var setup := GameState.setup
 	_fill_missing_setup(setup)
 	GameState.reset()
+	if not Config.game.debug_tools_enabled():
+		$DebugPanel.queue_free()
 
 	var map := setup.map.scene.instantiate() as GameMap
 	map_holder.add_child(map)
@@ -36,7 +47,7 @@ func _ready() -> void:
 	GraphicsSettings.apply(get_tree(), Save.profile.settings)
 	_duration = setup.duration()
 	GameState.is_running = true
-	Events.player_died.connect(_end_run.bind(false))
+	Events.player_died.connect(end_run.bind(false))
 	Events.run_started.emit()
 	Events.xp_changed.emit(0, GameState.progression.xp_needed(), 1)
 	Audio.play_music(setup.map.music_id)
@@ -55,13 +66,18 @@ func _physics_process(delta: float) -> void:
 	if _duration > 0.0:
 		if not _last_minute_warned and GameState.elapsed >= _duration - 60.0 and _duration > 120.0:
 			_last_minute_warned = true
-			Events.announcement.emit("ULTIMO MINUTO! AGUENTE FIRME!", Color(0.5, 1, 0.6))
+			Events.announcement.emit("ÚLTIMO MINUTO! AGUENTE FIRME!", Color(0.5, 1, 0.6))
 		if GameState.elapsed >= _duration:
-			_end_run(true)
+			end_run(true)
+
+
+## Desistir pelo menu de pausa: conta como derrota (o progresso e salvo).
+func abandon() -> void:
+	end_run(false)
 
 
 ## Encerra a partida (vitoria ou derrota).
-func _end_run(victory: bool) -> void:
+func end_run(victory: bool) -> void:
 	if not GameState.is_running or _ending:
 		return
 	_ending = true

@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_01th8")
 id = &"smg_pierce"
-title = "Metralhadora: +Perfuracao"
+title = "Metralhadora: +Perfuração"
 description = "Balas atravessam mais um zumbi."
 kind = 1
 weapon = ExtResource("2_k6wsn")

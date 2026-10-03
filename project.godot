@@ -26,6 +26,7 @@ GameState="*res://autoload/game_state.gd"
 Pool="*res://autoload/pool.gd"
 Audio="*res://autoload/audio.gd"
 Ranking="*res://autoload/ranking.gd"
+SceneFlow="*res://autoload/scene_flow.gd"
 
 [debug]
 

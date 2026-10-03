@@ -13,13 +13,15 @@ var language: String = "pt_BR"
 var quality: int = Quality.MEDIUM
 var vibration: bool = true
 var notifications: bool = true
+## Debug: partidas normais curtas (Config.game.debug_match_duration).
+var debug_short_match: bool = false
 
 
 func to_dict() -> Dictionary:
 	return {
 		"master_volume": master_volume, "music_volume": music_volume, "sfx_volume": sfx_volume,
 		"music_on": music_on, "sfx_on": sfx_on, "language": language, "quality": quality,
-		"vibration": vibration, "notifications": notifications,
+		"vibration": vibration, "notifications": notifications, "debug_short_match": debug_short_match,
 	}
 
 
@@ -34,4 +36,5 @@ static func from_dict(d: Dictionary) -> GameSettings:
 	s.quality = clampi(int(d.get("quality", s.quality)), 0, 2)
 	s.vibration = bool(d.get("vibration", s.vibration))
 	s.notifications = bool(d.get("notifications", s.notifications))
+	s.debug_short_match = bool(d.get("debug_short_match", false))
 	return s

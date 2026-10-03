@@ -56,6 +56,7 @@ func reset() -> void:
 	upgrade_counts.clear()
 	owned_weapons.clear()
 	weapon_levels.clear()
+	_pause_owners.clear()
 
 
 var level: int:
@@ -72,6 +73,28 @@ func add_xp(amount: int) -> void:
 	Events.xp_changed.emit(progression.xp, progression.xp_needed(), progression.level)
 	for i: int in gained:
 		Events.level_up.emit(progression.level - gained + i + 1)
+
+
+## --- Pausa compartilhada ---
+## Varias telas podem pausar ao mesmo tempo (level-up, tutorial, pausa,
+## debug). O jogo so volta quando TODAS liberarem.
+var _pause_owners: Array[Object] = []
+
+
+func request_pause(owner: Object) -> void:
+	if not _pause_owners.has(owner):
+		_pause_owners.append(owner)
+	get_tree().paused = true
+
+
+func release_pause(owner: Object) -> void:
+	_pause_owners.erase(owner)
+	if _pause_owners.is_empty() and is_running:
+		get_tree().paused = false
+
+
+func clear_pauses() -> void:
+	_pause_owners.clear()
 
 
 func register_pick(upgrade: UpgradeData) -> void:

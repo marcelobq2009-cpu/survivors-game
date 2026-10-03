@@ -6,7 +6,7 @@
 script = ExtResource("1_txscv")
 id = &"p_crit"
 title = "Mira Treinada"
-description = "+6% de chance de critico."
+description = "+6% de chance de crítico."
 stat = &"crit_chance"
 value = 0.06
 tag = &"critico"

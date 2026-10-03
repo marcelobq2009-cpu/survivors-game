@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_an8rf")
 id = &"machete_area"
-title = "Facao: +Alcance"
+title = "Facão: +Alcance"
 description = "Golpe 20% maior."
 kind = 1
 weapon = ExtResource("2_jyhbg")

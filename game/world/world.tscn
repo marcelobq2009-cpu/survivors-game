@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://game/world/world.gd" id="1_world"]
 [ext_resource type="Script" path="res://game/enemies/enemy_manager.gd" id="2_enemies"]
@@ -7,6 +7,13 @@
 [ext_resource type="Script" path="res://game/world/effects.gd" id="5_effects"]
 [ext_resource type="Script" path="res://game/enemies/enemy_spawner.gd" id="6_spawner"]
 [ext_resource type="Script" path="res://game/world/camera_rig.gd" id="7_camera"]
+[ext_resource type="Script" path="res://ui/hud.gd" id="8_hud"]
+[ext_resource type="Script" path="res://ui/level_up_screen.gd" id="9_levelup"]
+[ext_resource type="Script" path="res://ui/pause_menu.gd" id="10_pause"]
+[ext_resource type="Script" path="res://ui/results_screen.gd" id="11_results"]
+[ext_resource type="Script" path="res://ui/debug_panel.gd" id="12_debug"]
+[ext_resource type="Script" path="res://ui/tutorial_overlay.gd" id="13_tutorial"]
+[ext_resource type="Script" path="res://ui/debug_overlay.gd" id="14_overlay"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_world")
@@ -33,3 +40,24 @@ script = ExtResource("7_camera")
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig"]
 current = true
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("8_hud")
+
+[node name="LevelUpScreen" type="CanvasLayer" parent="."]
+script = ExtResource("9_levelup")
+
+[node name="PauseMenu" type="CanvasLayer" parent="."]
+script = ExtResource("10_pause")
+
+[node name="ResultsScreen" type="CanvasLayer" parent="."]
+script = ExtResource("11_results")
+
+[node name="DebugPanel" type="CanvasLayer" parent="."]
+script = ExtResource("12_debug")
+
+[node name="TutorialOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("13_tutorial")
+
+[node name="DebugOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("14_overlay")

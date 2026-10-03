@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_vfwyj")
 id = &"p_damage"
-title = "Municao Reforcada"
+title = "Munição Reforçada"
 description = "+15% de dano em tudo."
 stat = &"damage_mult"
 value = 0.15

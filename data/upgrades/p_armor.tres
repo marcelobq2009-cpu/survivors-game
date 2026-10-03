@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_0bb1x")
 id = &"p_armor"
-title = "Protecao Improvisada"
+title = "Proteção Improvisada"
 description = "-1 de dano recebido por golpe."
 stat = &"armor"
 value = 1.0

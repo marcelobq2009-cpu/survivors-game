@@ -6,7 +6,7 @@
 script = ExtResource("1_ogypo")
 id = &"p_crit_damage"
 title = "Tiro Certeiro"
-description = "Criticos causam +30% de dano."
+description = "Críticos causam +30% de dano."
 stat = &"crit_damage"
 value = 0.3
 max_picks = 4

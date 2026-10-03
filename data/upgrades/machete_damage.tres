@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_r4rnt")
 id = &"machete_damage"
-title = "Facao: +Dano"
+title = "Facão: +Dano"
 description = "+8 de dano por golpe."
 kind = 1
 weapon = ExtResource("2_f5gpf")

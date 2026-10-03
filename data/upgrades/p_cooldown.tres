@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_fkufg")
 id = &"p_cooldown"
-title = "Mao Rapida"
+title = "Mão Rápida"
 description = "Armas 8% mais rapidas."
 stat = &"cooldown_mult"
 value = 0.92

@@ -7,7 +7,7 @@
 script = ExtResource("2_paksq")
 id = &"smg"
 display_name = "Metralhadora"
-description = "Rajada rapida e imprecisa."
+description = "Rajada rápida e imprecisa."
 scene = ExtResource("1_x5fss")
 color = Color(0.6, 1, 1, 1)
 damage = 3.5

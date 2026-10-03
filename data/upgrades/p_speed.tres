@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_q65r5")
 id = &"p_speed"
-title = "Tenis de Corrida"
+title = "Tênis de Corrida"
 description = "+8% de velocidade."
 stat = &"move_speed"
 value = 1.08

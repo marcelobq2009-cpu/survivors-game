@@ -1,13 +1,17 @@
 class_name TouchJoystick
 extends Control
-## Joystick flutuante para toque: aparece onde o dedo encosta na metade de
-## baixo da tela. So reage a eventos de TOQUE (no PC com mouse nao aparece).
+## Joystick flutuante para toque (paisagem): aparece onde o dedo encosta no
+## lado ESQUERDO da tela (60%), fora da faixa do HUD no topo. So reage a TOQUE.
 ## Em vez de falar com o jogador, ele "aperta" as acoes move_* com forca
 ## proporcional — o jogador le Input.get_vector como faria com o teclado.
 
-@export var radius: float = 120.0
-@export var knob_radius: float = 50.0
-@export var dead_zone: float = 0.15
+@export var radius: float = 110.0
+@export var knob_radius: float = 46.0
+@export var dead_zone: float = 0.12
+## Fracao da largura da tela (a partir da esquerda) que aceita o joystick.
+@export var area_width: float = 0.6
+## Faixa do topo reservada para o HUD (botoes).
+@export var top_reserved: float = 150.0
 
 var _touch_index: int = -1
 var _origin: Vector2
@@ -15,14 +19,15 @@ var _knob: Vector2
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
-		if touch.pressed and _touch_index == -1 and touch.position.y > get_viewport_rect().size.y * 0.5:
+		var vp := get_viewport_rect().size
+		if touch.pressed and _touch_index == -1 and touch.position.x < vp.x * area_width \
+				and touch.position.y > top_reserved:
 			_touch_index = touch.index
 			_origin = touch.position
 			_knob = touch.position
@@ -32,7 +37,11 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		var drag := event as InputEventScreenDrag
 		if drag.index == _touch_index:
-			_knob = _origin + (drag.position - _origin).limit_length(radius)
+			# Joystick "segue" o dedo se ele passar do raio (mais confortavel).
+			var offset := drag.position - _origin
+			if offset.length() > radius:
+				_origin = drag.position - offset.normalized() * radius
+			_knob = drag.position
 			_apply()
 
 
@@ -63,7 +72,7 @@ func _reset() -> void:
 
 func _set_action(action: StringName, strength: float) -> void:
 	if strength > 0.0:
-		Input.action_press(action, strength)
+		Input.action_press(action, minf(1.0, strength))
 	else:
 		Input.action_release(action)
 
@@ -71,6 +80,6 @@ func _set_action(action: StringName, strength: float) -> void:
 func _draw() -> void:
 	if _touch_index == -1:
 		return
-	draw_circle(_origin, radius, Color(1, 1, 1, 0.12))
+	draw_circle(_origin, radius, Color(0, 0, 0, 0.25))
 	draw_arc(_origin, radius, 0.0, TAU, 48, Color(1, 1, 1, 0.35), 4.0, true)
-	draw_circle(_knob, knob_radius, Color(1, 1, 1, 0.45))
+	draw_circle(_knob, knob_radius, Color(0.95, 0.55, 0.2, 0.6))
