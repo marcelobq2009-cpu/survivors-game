@@ -36,10 +36,9 @@ const SILENT_DB := -60.0
 const BAKE_FIRST: Array[StringName] = [&"ui_click", &"ui_select", &"ui_back", &"ui_transition"]
 ## Trilhas preparadas ja na abertura do jogo (o resto: na tela de carregamento).
 const MUSIC_STARTUP: Array[StringName] = [&"menu", &"loading"]
-const MUSIC_GAME: Array[StringName] = [&"boss", &"music_game", &"ranked"]
-## Tempo de preparo por frame: na tela de carregamento e durante a partida.
+const MUSIC_GAME: Array[StringName] = [&"music_game", &"ranked", &"boss"]
+## Tempo de preparo por frame: na tela de carregamento e no menu.
 const LOADING_BUDGET_MS := 30
-const BACKGROUND_BUDGET_MS := 3
 const MENU_BUDGET_MS := 6
 
 signal music_ready(track: StringName)
@@ -105,15 +104,18 @@ func _ready() -> void:
 		a.volume_db = SILENT_DB
 		_amb_players.append(a)
 	# Fila de preparo em segundo plano (poucos ms por frame): primeiro a
-	# interface, depois o resto, enquanto o jogador esta no menu. O que faltar
-	# e terminado na tela de carregamento da partida.
+	# interface, depois os efeitos curtos, enquanto o jogador esta no menu.
+	# Os pesados (loops, ambiente, chefes: 100-300 ms cada no PC, mais na web)
+	# ficam para a tela de carregamento, onde uma pausa nao trava um toque.
 	for id: StringName in BAKE_FIRST:
 		_bake_queue.append(id)
 	for id: StringName in catalog:
 		if String(id).begins_with("ui_") and not _bake_queue.has(id):
 			_bake_queue.append(id)
 	for id: StringName in catalog:
-		if not _bake_queue.has(id):
+		var def := _def(id)
+		var heavy := def.loop or def.bus == SoundCatalog.BUS_AMBIENCE or def.bus == SoundCatalog.BUS_BOSSES
+		if not heavy and not _bake_queue.has(id):
 			_bake_queue.append(id)
 	apply_settings(Save.profile.settings)
 	Save.profile_changed.connect(func() -> void: apply_settings(Save.profile.settings))
@@ -637,21 +639,25 @@ func _compose_all() -> void:
 	_composing = false
 
 
-## Prepara (gera ou carrega do cache) o que a partida precisa para comecar:
-## efeitos e a musica principal `main_track`. Chamado pela tela de carregamento;
-## `progress` recebe (0..1, texto). O resto (chefe, outras trilhas, vinhetas) e
-## composto em segundo plano durante a partida. Rapido depois da 1a vez (cache).
+## Prepara (gera ou carrega do cache) tudo que a partida usa: efeitos, a
+## musica principal `main_track` (primeiro), as outras trilhas e as vinhetas.
+## Chamado pela tela de carregamento; `progress` recebe (0..1, texto). Nada e
+## gerado durante a partida (cada etapa pesada travaria o jogo por um instante).
+## Rapido depois da 1a vez (cache).
 func prepare_for_game(progress: Callable = Callable(), main_track: StringName = &"music_game") -> void:
-	while _composing:  # Ainda compondo algo de antes: acelera e espera.
-		_composer.frame_budget_ms = LOADING_BUDGET_MS
+	_composer.frame_budget_ms = LOADING_BUDGET_MS
+	while _composing:  # Ainda compondo a musica do menu: acelera e espera.
 		await get_tree().process_frame
 	_composing = true
-	_composer.frame_budget_ms = LOADING_BUDGET_MS
 	var ids: Array[StringName] = []
 	for id: StringName in catalog:
 		if not _streams.has(id):
 			ids.append(id)
-	var total := ids.size() + 1
+	var tracks: Array[StringName] = [main_track]
+	for t: StringName in MUSIC_GAME:
+		if not tracks.has(t):
+			tracks.append(t)
+	var total := ids.size() + tracks.size() + 1
 	var done := 0
 	var frame_start := Time.get_ticks_msec()
 	for id: StringName in ids:
@@ -662,31 +668,18 @@ func prepare_for_game(progress: Callable = Callable(), main_track: StringName = 
 				progress.call(float(done) / total, "Afinando a batucada")
 			await get_tree().process_frame
 			frame_start = Time.get_ticks_msec()
-	if progress.is_valid():
-		progress.call(float(done) / total, "Compondo a trilha")
-	if MusicComposer.TRACKS.has(main_track) and not _tracks.has(main_track):
-		await _prepare_track(main_track)
-		if _wanted_music == main_track and _music_id != main_track:
-			_switch_music(main_track)
-	if progress.is_valid():
-		progress.call(1.0, "Pronto")
-	_composing = false
-	_prepare_rest_in_background()
-
-
-## Compoe o restante das musicas da partida e as vinhetas aos poucos (pouco
-## tempo por frame). Se o chefe chegar antes, a musica dele entra quando ficar pronta.
-func _prepare_rest_in_background() -> void:
-	if _composing:
-		return
-	_composing = true
-	_composer.frame_budget_ms = BACKGROUND_BUDGET_MS
-	await _prepare_stingers()
-	for track: StringName in MUSIC_GAME:
-		if not _tracks.has(track):
+	for track: StringName in tracks:
+		if progress.is_valid():
+			progress.call(float(done) / total, "Compondo a trilha")
+		if MusicComposer.TRACKS.has(track) and not _tracks.has(track):
 			await _prepare_track(track)
 			if _wanted_music == track and _music_id != track:
 				_switch_music(track)
+		done += 1
+	await _prepare_stingers()
+	if progress.is_valid():
+		progress.call(1.0, "Pronto")
+	_composer.frame_budget_ms = MENU_BUDGET_MS
 	_composing = false
 
 

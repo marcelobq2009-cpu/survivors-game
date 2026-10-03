@@ -40,9 +40,18 @@ func render_track(id: StringName) -> Array[PackedFloat32Array]:
 		_frame_start = Time.get_ticks_msec()
 		var buf := Synth.silence(_length(def))
 		await _layer(id, layer, buf, float(def["bpm"]), int(def["bars"]))
-		Synth.drive(buf, 1.3)
+		await _drive(buf, 1.3)
 		out.append(buf)
 	return out
+
+
+## Saturacao (igual a Synth.drive) em pedacos, para nao travar o frame.
+func _drive(buf: PackedFloat32Array, amount: float) -> void:
+	var norm := 1.0 / tanh(amount)
+	for i: int in buf.size():
+		buf[i] = tanh(buf[i] * amount) * norm
+		if i % 8192 == 0:
+			await _breathe()
 
 
 func render_stinger(id: StringName) -> PackedFloat32Array:
@@ -59,13 +68,13 @@ func render_stinger(id: StringName) -> PackedFloat32Array:
 				Synth.mix_into(out, _get(&"surdo"), t, 0.9)
 			for t: float in [0.8, 0.95, 1.1, 1.25]:
 				Synth.mix_into(out, _get(&"agogo_hi"), t, 0.4)
-			Synth.mix_into(out, _pad([48, 52, 55, 60], 3.5), 0.8, 0.5)
+			Synth.mix_into(out, await _pad([48, 52, 55, 60], 3.5), 0.8, 0.5)
 		&"defeat":
 			out = Synth.silence(4.0)
 			var notes2 := [69, 65, 62, 57]
 			for i: int in notes2.size():
 				Synth.mix_into(out, _lead(notes2[i], 0.6), i * 0.4, 0.4)
-			Synth.mix_into(out, _pad([45, 48, 52], 3.5), 0.2, 0.45)
+			Synth.mix_into(out, await _pad([45, 48, 52], 3.5), 0.2, 0.45)
 			Synth.mix_into(out, _get(&"surdo"), 0.0, 1.0)
 			Synth.mix_into(out, _get(&"surdo"), 1.6, 0.8)
 		&"boss_intro":
@@ -99,7 +108,7 @@ func _layer(id: StringName, layer: int, buf: PackedFloat32Array, bpm: float, bar
 			var chords := [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]]
 			if layer == 0:
 				for bar: int in bars:
-					_hit(buf, _pad(chords[bar % 4], step * 16), bar * 16, step, 0.38)
+					_hit(buf, await _pad(chords[bar % 4], step * 16), bar * 16, step, 0.38)
 					for s: int in [0, 3, 6, 8, 11, 14]:
 						var note := 50 if s % 2 == 0 else 52
 						_hit(buf, _berimbau(note + (0 if bar % 2 == 0 else -2)), bar * 16 + s, step, 0.5)
@@ -119,7 +128,7 @@ func _layer(id: StringName, layer: int, buf: PackedFloat32Array, bpm: float, bar
 				var b := bar * 16
 				match layer:
 					0:
-						_hit(buf, _pad(chords[bar], step * 16), b, step, 0.32)
+						_hit(buf, await _pad(chords[bar], step * 16), b, step, 0.32)
 						for s: int in range(0, 16, 2):
 							_hit(buf, _get(&"ganza"), b + s, step, 0.14)
 					1:
@@ -271,6 +280,7 @@ func _pad(notes: Array, seconds: float) -> PackedFloat32Array:
 		for detune: float in [0.997, 1.003]:
 			var v := Synth.tone(Synth.midi(n) * detune, seconds, Synth.Wave.SAW, seconds * 0.35, 0.4, 0.22)
 			Synth.mix_into(out, v, 0.0)
+			await _breathe()  # Cada voz e pesada: respira entre elas.
 	_inst[key] = Synth.lowpass(out, 1100.0)
 	return _inst[key]
 
