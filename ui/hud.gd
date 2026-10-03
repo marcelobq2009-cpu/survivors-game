@@ -74,12 +74,12 @@ func _build_left() -> Control:
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.custom_minimum_size.x = 360
 	var row := UiKit.hbox(10)
-	_level_label = UiKit.label("Nv 1", 28, UiKit.TOXIC)
+	_level_label = UiKit.label("Nv 1", 34, UiKit.TOXIC)
 	row.add_child(_level_label)
-	_hp_label = UiKit.label("100", 20, UiKit.TEXT)
+	_hp_label = UiKit.label("100", 26, UiKit.TEXT)
 	row.add_child(_hp_label)
 	col.add_child(row)
-	_hp_bar = UiKit.bar(UiKit.DANGER, 18)
+	_hp_bar = UiKit.bar(UiKit.DANGER, 22)
 	col.add_child(_hp_bar)
 	_weapons_row = UiKit.hbox(6)
 	col.add_child(_weapons_row)
@@ -90,7 +90,7 @@ func _build_center() -> Control:
 	var col := UiKit.vbox(2)
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_time_label = UiKit.label("00:00", 44, UiKit.TEXT, HORIZONTAL_ALIGNMENT_CENTER)
+	_time_label = UiKit.label("00:00", 48, UiKit.TEXT, HORIZONTAL_ALIGNMENT_CENTER)
 	col.add_child(_time_label)
 	_mode_label = UiKit.label("", 18, UiKit.ACCENT, HORIZONTAL_ALIGNMENT_CENTER)
 	col.add_child(_mode_label)
@@ -120,9 +120,9 @@ func _build_right() -> Control:
 	pause.pressed.connect(Events.pause_requested.emit)
 	row.add_child(pause)
 	col.add_child(row)
-	_kills_label = UiKit.label("0 abates", 22, UiKit.TEXT, HORIZONTAL_ALIGNMENT_RIGHT)
+	_kills_label = UiKit.label("0 abates", 28, UiKit.TEXT, HORIZONTAL_ALIGNMENT_RIGHT)
 	col.add_child(_kills_label)
-	_gold_label = UiKit.label("OURO 0", 22, UiKit.GOLD, HORIZONTAL_ALIGNMENT_RIGHT)
+	_gold_label = UiKit.label("OURO 0", 28, UiKit.GOLD, HORIZONTAL_ALIGNMENT_RIGHT)
 	col.add_child(_gold_label)
 	return col
 
@@ -176,9 +176,9 @@ func _refresh_weapons() -> void:
 		var w: Weapon = player.weapons.get(id)
 		if w == null:
 			continue
-		var slot := UiKit.badge(w.data.display_name.left(1), w.data.color, 46)
+		var slot := UiKit.badge(w.data.display_name.left(1), w.data.color, 54)
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var lvl := UiKit.label(str(GameState.weapon_level(id)), 14, UiKit.TEXT)
+		var lvl := UiKit.label(str(GameState.weapon_level(id)), 18, UiKit.TEXT)
 		lvl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 		slot.add_child(lvl)
 		_weapons_row.add_child(slot)
