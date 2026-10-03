@@ -1,11 +1,18 @@
 class_name Health
 extends RefCounted
-## Logica pura de vida: dano, cura, morte e invencibilidade temporaria.
+## Logica pura de vida: dano (com armadura), cura, regeneracao, morte e
+## invencibilidade temporaria.
 
 var max_value: float
 var current: float
 ## Segundos invulneravel depois de levar dano (0 = nunca).
 var invincibility_time: float
+## Reduz cada golpe nesta quantidade (minimo 1 de dano).
+var armor: float = 0.0
+## Vida por segundo.
+var regen: float = 0.0
+## Debug: ignora todo dano.
+var god_mode: bool = false
 var _invincible_left: float = 0.0
 
 
@@ -17,9 +24,10 @@ func _init(p_max: float, p_invincibility_time: float = 0.0) -> void:
 
 ## Aplica dano e retorna quanto foi realmente aplicado (0 se invulneravel/morto).
 func take_damage(amount: float) -> float:
-	if amount <= 0.0 or is_dead() or is_invincible():
+	if amount <= 0.0 or is_dead() or is_invincible() or god_mode:
 		return 0.0
-	var applied := minf(amount, current)
+	var reduced := maxf(1.0, amount - armor)
+	var applied := minf(reduced, current)
 	current -= applied
 	_invincible_left = invincibility_time
 	return applied
@@ -40,6 +48,8 @@ func set_max(value: float) -> void:
 
 func update(delta: float) -> void:
 	_invincible_left = maxf(0.0, _invincible_left - delta)
+	if regen > 0.0:
+		heal(regen * delta)
 
 
 func is_invincible() -> bool:

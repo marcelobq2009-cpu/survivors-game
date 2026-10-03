@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_q1md7"]
+[ext_resource type="Resource" path="res://data/weapons/shotgun.tres" id="2_45grw"]
+
+[resource]
+script = ExtResource("1_q1md7")
+id = &"shotgun_pellets"
+title = "Espingarda: +2 chumbos"
+description = "Mais chumbo por disparo."
+kind = 1
+weapon = ExtResource("2_45grw")
+stat = &"projectile_count"
+value = 2.0
+max_picks = 3
+tag = &"projeteis"
+color = Color(1, 0.82, 0.35, 1)

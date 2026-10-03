@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_d0iva"]
+
+[resource]
+script = ExtResource("1_d0iva")
+id = &"zombie_walker"
+display_name = "Zumbi Comum"
+max_health = 14.0
+speed = 1.6
+contact_damage = 7.0
+radius = 0.38
+gold_chance = 0.03
+body_color = Color(0.35, 0.42, 0.55, 1)
+skin_color = Color(0.55, 0.68, 0.48, 1)

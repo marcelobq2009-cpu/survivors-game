@@ -1,0 +1,84 @@
+[gd_resource type="Resource" script_class="WaveTimeline" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/wave_timeline.gd" id="1_odckx"]
+[ext_resource type="Script" path="res://game/enemies/wave_data.gd" id="2_efr37"]
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="3_xqtl3"]
+[ext_resource type="Resource" path="res://data/enemies/zombie_walker.tres" id="4_re5hh"]
+[ext_resource type="Resource" path="res://data/enemies/zombie_runner.tres" id="5_bcycs"]
+[ext_resource type="Resource" path="res://data/enemies/zombie_bloater.tres" id="6_5uka0"]
+[ext_resource type="Resource" path="res://data/enemies/zombie_brute.tres" id="7_asd2u"]
+
+[sub_resource type="Resource" id="Resource_dy87s"]
+script = ExtResource("2_efr37")
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh")])
+spawn_interval = 1.2
+spawn_count = 3
+max_alive = 40
+
+[sub_resource type="Resource" id="Resource_lmhcj"]
+script = ExtResource("2_efr37")
+start_time = 60.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("4_re5hh"), ExtResource("5_bcycs")])
+spawn_count = 4
+max_alive = 60
+
+[sub_resource type="Resource" id="Resource_6rr35"]
+script = ExtResource("2_efr37")
+start_time = 180.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("5_bcycs")])
+spawn_interval = 0.9
+spawn_count = 5
+max_alive = 90
+
+[sub_resource type="Resource" id="Resource_467ms"]
+script = ExtResource("2_efr37")
+start_time = 300.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("6_5uka0")])
+spawn_interval = 0.9
+spawn_count = 6
+max_alive = 120
+
+[sub_resource type="Resource" id="Resource_juugj"]
+script = ExtResource("2_efr37")
+start_time = 480.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
+spawn_interval = 0.8
+spawn_count = 7
+max_alive = 150
+
+[sub_resource type="Resource" id="Resource_qbpjc"]
+script = ExtResource("2_efr37")
+start_time = 720.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
+spawn_interval = 0.75
+spawn_count = 8
+max_alive = 190
+
+[sub_resource type="Resource" id="Resource_ie2up"]
+script = ExtResource("2_efr37")
+start_time = 960.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0"), ExtResource("4_re5hh")])
+spawn_interval = 0.7
+spawn_count = 9
+max_alive = 230
+
+[sub_resource type="Resource" id="Resource_rvdjm"]
+script = ExtResource("2_efr37")
+start_time = 1200.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("5_bcycs"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("7_asd2u"), ExtResource("6_5uka0")])
+spawn_interval = 0.65
+spawn_count = 10
+max_alive = 270
+
+[sub_resource type="Resource" id="Resource_6fqvq"]
+script = ExtResource("2_efr37")
+start_time = 1500.0
+enemies = Array[ExtResource("3_xqtl3")]([ExtResource("4_re5hh"), ExtResource("5_bcycs"), ExtResource("7_asd2u"), ExtResource("6_5uka0"), ExtResource("6_5uka0")])
+spawn_interval = 0.6
+spawn_count = 12
+max_alive = 310
+
+[resource]
+script = ExtResource("1_odckx")
+run_duration = 1800.0
+waves = Array[ExtResource("2_efr37")]([SubResource("Resource_dy87s"), SubResource("Resource_lmhcj"), SubResource("Resource_6rr35"), SubResource("Resource_467ms"), SubResource("Resource_juugj"), SubResource("Resource_qbpjc"), SubResource("Resource_ie2up"), SubResource("Resource_rvdjm"), SubResource("Resource_6fqvq")])

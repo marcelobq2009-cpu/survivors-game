@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://game/weapons/projectile_weapon.tscn" id="1_x5fss"]
+[ext_resource type="Script" path="res://game/weapons/weapon_data.gd" id="2_paksq"]
+
+[resource]
+script = ExtResource("2_paksq")
+id = &"smg"
+display_name = "Metralhadora"
+description = "Rajada rapida e imprecisa."
+scene = ExtResource("1_x5fss")
+color = Color(0.6, 1, 1, 1)
+damage = 3.5
+cooldown = 0.13
+area = 0.2
+projectile_speed = 24.0
+spread_degrees = 8.0
+target_range = 13.0
+knockback = 0.8
+uses_projectile_bonus = false
+sound_id = &"smg"

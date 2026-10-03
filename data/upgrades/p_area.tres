@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_7movj"]
+
+[resource]
+script = ExtResource("1_7movj")
+id = &"p_area"
+title = "Explosivos Caseiros"
+description = "+12% de area em tudo."
+stat = &"area_mult"
+value = 0.12
+tag = &"area"
+color = Color(1, 0.45, 0.35, 1)

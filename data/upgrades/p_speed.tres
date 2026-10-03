@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_q65r5"]
+
+[resource]
+script = ExtResource("1_q65r5")
+id = &"p_speed"
+title = "Tenis de Corrida"
+description = "+8% de velocidade."
+stat = &"move_speed"
+value = 1.08
+is_multiplier = true
+max_picks = 4
+tag = &"utilidade"
+color = Color(0.8, 0.6, 1, 1)

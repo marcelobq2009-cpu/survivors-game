@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_fkufg"]
+
+[resource]
+script = ExtResource("1_fkufg")
+id = &"p_cooldown"
+title = "Mao Rapida"
+description = "Armas 8% mais rapidas."
+stat = &"cooldown_mult"
+value = 0.92
+is_multiplier = true
+tag = &"cadencia"
+color = Color(1, 0.45, 0.35, 1)

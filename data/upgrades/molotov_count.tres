@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_yxkny"]
+[ext_resource type="Resource" path="res://data/weapons/molotov.tres" id="2_2pwxo"]
+
+[resource]
+script = ExtResource("1_yxkny")
+id = &"molotov_count"
+title = "Molotov: +1 garrafa"
+description = "Arremessa mais uma garrafa."
+kind = 1
+weapon = ExtResource("2_2pwxo")
+stat = &"projectile_count"
+value = 1.0
+max_picks = 3
+tag = &"projeteis"
+color = Color(1, 0.82, 0.35, 1)

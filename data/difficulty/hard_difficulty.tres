@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DifficultyProfile" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_ufr7s"]
+[ext_resource type="Resource" path="res://data/enemies/boss_colossus.tres" id="2_gjq0x"]
+[ext_resource type="Resource" path="res://data/enemies/boss_mutant.tres" id="3_coped"]
+[ext_resource type="Script" path="res://game/enemies/difficulty_profile.gd" id="4_noev7"]
+
+[resource]
+script = ExtResource("4_noev7")
+health_growth_per_min = 0.07
+spawn_rate_growth_per_min = 0.055
+bosses = Array[ExtResource("1_ufr7s")]([ExtResource("2_gjq0x"), ExtResource("3_coped")])

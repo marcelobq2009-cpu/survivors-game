@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://game/weapons/projectile_weapon.tscn" id="1_s5evd"]
+[ext_resource type="Script" path="res://game/weapons/weapon_data.gd" id="2_rh2sn"]
+
+[resource]
+script = ExtResource("2_rh2sn")
+id = &"pistol_gold"
+display_name = "Pistola Rajada"
+description = "Evolucao da pistola: rajadas que atravessam."
+scene = ExtResource("1_s5evd")
+color = Color(1, 0.8, 0.2, 1)
+damage = 16.0
+cooldown = 0.45
+area = 0.3
+projectile_speed = 26.0
+projectile_count = 3
+pierce = 4
+target_range = 16.0

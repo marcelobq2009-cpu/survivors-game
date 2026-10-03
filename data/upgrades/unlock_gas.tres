@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_gi8dm"]
+[ext_resource type="Resource" path="res://data/weapons/gas.tres" id="2_e4pm4"]
+
+[resource]
+script = ExtResource("1_gi8dm")
+id = &"unlock_gas"
+title = "Nova arma: Gas"
+description = "Nuvem que fere tudo ao seu redor."
+kind = 0
+weapon = ExtResource("2_e4pm4")
+max_picks = 1
+tag = &"arma"
+color = Color(0.55, 1, 0.5, 1)

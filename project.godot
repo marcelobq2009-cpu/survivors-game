@@ -10,19 +10,22 @@ config_version=5
 
 [application]
 
-config/name="Survivors Game"
-config/description="Prototipo survivors-like (base reskinavel)."
-config/version="0.1.0"
+config/name="Apocalipse Brasil"
+config/description="Survivor-like de apocalipse zumbi no Brasil (3D isometrico, mobile)."
+config/version="0.2.0"
 run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
+Config="*res://autoload/config.gd"
 Events="*res://autoload/events.gd"
+Content="*res://autoload/content.gd"
+Save="*res://autoload/save.gd"
 GameState="*res://autoload/game_state.gd"
 Pool="*res://autoload/pool.gd"
-Save="*res://autoload/save.gd"
 Audio="*res://autoload/audio.gd"
+Ranking="*res://autoload/ranking.gd"
 
 [debug]
 
@@ -31,13 +34,11 @@ gdscript/warnings/exclude_addons=true
 
 [display]
 
-window/size/viewport_width=720
-window/size/viewport_height=1280
-window/size/window_width_override=405
-window/size/window_height_override=720
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation=1
+window/handheld/orientation=4
 
 [editor_plugins]
 
@@ -90,6 +91,11 @@ debug_toggle={
 2d_physics/layer_2="enemy"
 2d_physics/layer_3="player_projectile"
 2d_physics/layer_4="pickup"
+3d_physics/layer_1="player"
+3d_physics/layer_2="enemy"
+3d_physics/layer_3="player_projectile"
+3d_physics/layer_4="pickup"
+3d_physics/layer_5="world"
 
 [rendering]
 

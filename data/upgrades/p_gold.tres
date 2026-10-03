@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_cc6o1"]
+
+[resource]
+script = ExtResource("1_cc6o1")
+id = &"p_gold"
+title = "Saqueador"
+description = "+20% de ouro."
+stat = &"gold_mult"
+value = 0.2
+max_picks = 3
+weight = 0.6
+tag = &"utilidade"
+color = Color(0.8, 0.6, 1, 1)

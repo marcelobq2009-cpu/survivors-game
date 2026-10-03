@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_evos8"]
+[ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="2_6d8pj"]
+
+[resource]
+script = ExtResource("1_evos8")
+id = &"pistol_damage"
+title = "Pistola: +Dano"
+description = "+5 de dano por tiro."
+kind = 1
+weapon = ExtResource("2_6d8pj")
+stat = &"damage"
+value = 5.0
+max_picks = 4
+tag = &"dano"
+color = Color(1, 0.82, 0.35, 1)

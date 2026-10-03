@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_7lgcq"]
+[ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="2_24rqu"]
+
+[resource]
+script = ExtResource("1_7lgcq")
+id = &"unlock_pistol"
+title = "Nova arma: Pistola"
+description = "Atira no zumbi mais proximo."
+kind = 0
+weapon = ExtResource("2_24rqu")
+max_picks = 1
+tag = &"arma"
+color = Color(0.55, 1, 0.5, 1)

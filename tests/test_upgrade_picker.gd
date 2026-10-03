@@ -79,10 +79,57 @@ func test_weight_zero_never_picked_when_others_exist() -> void:
 		assert_eq(UpgradePicker.pick(all, {}, [], 1, rng)[0].id, &"x")
 
 
+func test_evolution_requires_level_and_combo() -> void:
+	var base := WeaponData.new()
+	base.id = &"pistol"
+	var evo := _u("evolve", UpgradeData.Kind.EVOLVE, base, 1)
+	evo.evolves_to = WeaponData.new()
+	evo.requires_weapon_level = 5
+	evo.requires_upgrades = [&"p_crit"] as Array[StringName]
+	var owned: Array[StringName] = [&"pistol"]
+	assert_false(UpgradePicker.is_available(evo, {}, owned, {&"pistol": 5}), "falta a passiva")
+	assert_false(UpgradePicker.is_available(evo, {&"p_crit": 1}, owned, {&"pistol": 3}), "nivel baixo")
+	assert_true(UpgradePicker.is_available(evo, {&"p_crit": 1}, owned, {&"pistol": 5}))
+
+
+func test_available_evolution_always_offered() -> void:
+	var base := WeaponData.new()
+	base.id = &"pistol"
+	var evo := _u("evolve", UpgradeData.Kind.EVOLVE, base, 1, 0.01)
+	evo.evolves_to = WeaponData.new()
+	var all: Array[UpgradeData] = [evo]
+	for i: int in 6:
+		all.append(_u("p%d" % i, UpgradeData.Kind.PLAYER_STAT))
+	var owned: Array[StringName] = [&"pistol"]
+	for i: int in 10:
+		assert_has(UpgradePicker.pick(all, {}, owned, 3, rng, {&"pistol": 1}), evo)
+
+
+func test_weapon_slots_are_limited() -> void:
+	var w := WeaponData.new()
+	w.id = &"new"
+	var unlock := _u("unlock", UpgradeData.Kind.NEW_WEAPON, w, 1)
+	var owned: Array[StringName] = []
+	for i: int in UpgradePicker.MAX_WEAPONS:
+		owned.append(StringName("w%d" % i))
+	assert_false(UpgradePicker.is_available(unlock, {}, owned))
+
+
 func test_library_loads_all_project_upgrades() -> void:
 	var all := UpgradeLibrary.load_all()
-	assert_gt(all.size(), 5)
+	assert_gt(all.size(), 20)
+	var ids := {}
 	for u: UpgradeData in all:
-		assert_ne(u.id, &"upgrade", "%s precisa de um id proprio" % u.resource_path)
-		if u.kind != UpgradeData.Kind.PLAYER_STAT and u.kind != UpgradeData.Kind.HEAL:
-			assert_not_null(u.weapon, "%s precisa de weapon" % u.resource_path)
+		assert_false(ids.has(u.id), "id repetido: %s" % u.id)
+		ids[u.id] = true
+		match u.kind:
+			UpgradeData.Kind.NEW_WEAPON:
+				assert_not_null(u.weapon, "%s precisa de weapon" % u.resource_path)
+				assert_not_null(u.weapon.scene, "%s: arma sem cena" % u.resource_path)
+			UpgradeData.Kind.WEAPON_STAT, UpgradeData.Kind.PLAYER_STAT:
+				var target: Object = Weapon.new() if u.kind == UpgradeData.Kind.WEAPON_STAT else PlayerStats.new()
+				assert_true(u.stat in target, "%s: stat '%s' nao existe" % [u.resource_path, u.stat])
+				if target is Node:
+					(target as Node).free()
+			UpgradeData.Kind.EVOLVE:
+				assert_not_null(u.evolves_to, "%s precisa de evolves_to" % u.resource_path)

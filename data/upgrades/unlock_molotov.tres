@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_e0cbs"]
+[ext_resource type="Resource" path="res://data/weapons/molotov.tres" id="2_15stb"]
+
+[resource]
+script = ExtResource("1_e0cbs")
+id = &"unlock_molotov"
+title = "Nova arma: Molotov"
+description = "Explode em area onde cai."
+kind = 0
+weapon = ExtResource("2_15stb")
+max_picks = 1
+weight = 1.2
+tag = &"arma"
+color = Color(0.55, 1, 0.5, 1)

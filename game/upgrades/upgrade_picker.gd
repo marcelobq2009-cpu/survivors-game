@@ -3,36 +3,51 @@ extends RefCounted
 ## Sorteia as cartas de level-up (logica pura, testavel).
 ## Regras:
 ## - respeita max_picks de cada upgrade;
-## - NEW_WEAPON so aparece se o jogador ainda nao tem a arma;
+## - NEW_WEAPON so aparece se o jogador ainda nao tem a arma (e tem espaco);
 ## - WEAPON_STAT so aparece se o jogador ja tem a arma;
-## - sorteio com peso e sem repetir carta;
-## - cartas HEAL so entram para completar quando faltam opcoes.
+## - EVOLVE so aparece com a arma no nivel exigido + upgrades exigidos;
+## - sorteio com peso e sem repetir carta; evolucao disponivel sempre aparece;
+## - cartas HEAL/GOLD so entram para completar quando faltam opcoes.
+
+const MAX_WEAPONS := 6
 
 
-static func is_available(u: UpgradeData, counts: Dictionary, owned: Array[StringName]) -> bool:
+static func is_available(u: UpgradeData, counts: Dictionary, owned: Array[StringName],
+		weapon_levels: Dictionary = {}) -> bool:
 	var picks: int = counts.get(u.id, 0)
 	if u.max_picks > 0 and picks >= u.max_picks:
 		return false
+	for req: StringName in u.requires_upgrades:
+		if int(counts.get(req, 0)) <= 0:
+			return false
 	match u.kind:
 		UpgradeData.Kind.NEW_WEAPON:
-			return u.weapon != null and not owned.has(u.weapon.id)
+			return u.weapon != null and not owned.has(u.weapon.id) and owned.size() < MAX_WEAPONS
 		UpgradeData.Kind.WEAPON_STAT:
 			return u.weapon == null or owned.has(u.weapon.id)
+		UpgradeData.Kind.EVOLVE:
+			return u.weapon != null and u.evolves_to != null and owned.has(u.weapon.id) \
+					and int(weapon_levels.get(u.weapon.id, 0)) >= u.requires_weapon_level
 	return true
 
 
 static func pick(all: Array[UpgradeData], counts: Dictionary, owned: Array[StringName],
-		amount: int, rng: RandomNumberGenerator) -> Array[UpgradeData]:
+		amount: int, rng: RandomNumberGenerator, weapon_levels: Dictionary = {}) -> Array[UpgradeData]:
+	var evolutions: Array[UpgradeData] = []
 	var main: Array[UpgradeData] = []
 	var fallback: Array[UpgradeData] = []
 	for u: UpgradeData in all:
-		if not is_available(u, counts, owned):
+		if not is_available(u, counts, owned, weapon_levels):
 			continue
-		if u.kind == UpgradeData.Kind.HEAL:
-			fallback.append(u)
-		else:
-			main.append(u)
-	var result := _weighted_sample(main, amount, rng)
+		match u.kind:
+			UpgradeData.Kind.HEAL, UpgradeData.Kind.GOLD:
+				fallback.append(u)
+			UpgradeData.Kind.EVOLVE:
+				evolutions.append(u)
+			_:
+				main.append(u)
+	var result := _weighted_sample(evolutions, mini(1, amount), rng)
+	result.append_array(_weighted_sample(main, amount - result.size(), rng))
 	if result.size() < amount:
 		result.append_array(_weighted_sample(fallback, amount - result.size(), rng))
 	return result

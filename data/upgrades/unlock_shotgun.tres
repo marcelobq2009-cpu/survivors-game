@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_8mcwk"]
+[ext_resource type="Resource" path="res://data/weapons/shotgun.tres" id="2_bg45o"]
+
+[resource]
+script = ExtResource("1_8mcwk")
+id = &"unlock_shotgun"
+title = "Nova arma: Espingarda"
+description = "Leque de chumbo a curta distancia."
+kind = 0
+weapon = ExtResource("2_bg45o")
+max_picks = 1
+weight = 1.2
+tag = &"arma"
+color = Color(0.55, 1, 0.5, 1)

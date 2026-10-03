@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_vfwyj"]
+
+[resource]
+script = ExtResource("1_vfwyj")
+id = &"p_damage"
+title = "Municao Reforcada"
+description = "+15% de dano em tudo."
+stat = &"damage_mult"
+value = 0.15
+tag = &"dano"
+color = Color(1, 0.45, 0.35, 1)

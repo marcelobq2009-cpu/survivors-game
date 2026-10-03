@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CityLayout" format=3]
+
+[ext_resource type="Script" path="res://game/maps/city_layout.gd" id="1_einir"]
+
+[resource]
+script = ExtResource("1_einir")
+seed = 2016
+half_extents = Vector2(115, 95)
+palette = Array[Color]([Color(0.93, 0.85, 0.62, 1), Color(0.86, 0.56, 0.45, 1), Color(0.62, 0.76, 0.82, 1), Color(0.95, 0.92, 0.86, 1), Color(0.76, 0.82, 0.62, 1), Color(0.92, 0.72, 0.56, 1), Color(0.72, 0.7, 0.66, 1), Color(0.96, 0.82, 0.42, 1)])
+beach_south = true
+morro_north = true
+cristo = true
+sugarloaf = true

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_uhkn4"]
+[ext_resource type="Resource" path="res://data/weapons/shotgun.tres" id="2_36qb4"]
+
+[resource]
+script = ExtResource("1_uhkn4")
+id = &"shotgun_damage"
+title = "Espingarda: +Dano"
+description = "+3 de dano por chumbo."
+kind = 1
+weapon = ExtResource("2_36qb4")
+stat = &"damage"
+value = 3.0
+max_picks = 4
+tag = &"dano"
+color = Color(1, 0.82, 0.35, 1)

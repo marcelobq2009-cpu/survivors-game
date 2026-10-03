@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_5mvvu"]
+[ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="2_46rop"]
+
+[resource]
+script = ExtResource("1_5mvvu")
+id = &"pistol_rate"
+title = "Pistola: +Cadencia"
+description = "Atira 15% mais rapido."
+kind = 1
+weapon = ExtResource("2_46rop")
+stat = &"cooldown"
+value = 0.85
+is_multiplier = true
+max_picks = 3
+tag = &"cadencia"
+color = Color(1, 0.82, 0.35, 1)

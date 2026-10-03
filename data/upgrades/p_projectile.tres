@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_oea8m"]
+
+[resource]
+script = ExtResource("1_oea8m")
+id = &"p_projectile"
+title = "Carregador Extra"
+description = "+1 projetil nas armas de tiro."
+stat = &"projectile_bonus"
+value = 1.0
+max_picks = 2
+weight = 0.6
+tag = &"projeteis"
+color = Color(1, 0.45, 0.35, 1)

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_v3bc3"]
+
+[resource]
+script = ExtResource("1_v3bc3")
+id = &"zombie_runner"
+display_name = "Corredor"
+max_health = 9.0
+speed = 3.1
+radius = 0.34
+body_color = Color(0.75, 0.25, 0.2, 1)
+skin_color = Color(0.62, 0.7, 0.5, 1)
+model_scale = 0.92

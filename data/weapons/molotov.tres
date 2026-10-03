@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://game/weapons/thrown_weapon.tscn" id="1_su50w"]
+[ext_resource type="Script" path="res://game/weapons/weapon_data.gd" id="2_iormu"]
+
+[resource]
+script = ExtResource("2_iormu")
+id = &"molotov"
+display_name = "Molotov"
+description = "Explode em area onde cai."
+scene = ExtResource("1_su50w")
+color = Color(1, 0.45, 0.15, 1)
+damage = 18.0
+cooldown = 2.6
+area = 2.6
+lifetime = 0.7
+target_range = 13.0
+knockback = 4.0
+projectile_visual = 2
+sound_id = &"throw"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_3snp1"]
+
+[resource]
+script = ExtResource("1_3snp1")
+id = &"p_health"
+title = "Colete"
+description = "+25 de vida maxima."
+stat = &"max_health"
+value = 25.0
+tag = &"defesa"
+color = Color(0.45, 0.8, 1, 1)

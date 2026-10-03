@@ -4,3 +4,5 @@
 
 [resource]
 script = ExtResource("1_go8dk")
+growth = 5.0
+exponent = 1.32

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_ogypo"]
+
+[resource]
+script = ExtResource("1_ogypo")
+id = &"p_crit_damage"
+title = "Tiro Certeiro"
+description = "Criticos causam +30% de dano."
+stat = &"crit_damage"
+value = 0.3
+max_picks = 4
+weight = 0.8
+tag = &"critico"
+color = Color(1, 0.45, 0.35, 1)

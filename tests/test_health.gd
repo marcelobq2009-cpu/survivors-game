@@ -62,3 +62,39 @@ func test_stat_utils_keeps_ints_as_ints() -> void:
 func test_stat_utils_unknown_stat_returns_false() -> void:
 	var s := PlayerStats.new()
 	assert_false(StatUtils.apply(s, &"does_not_exist", 1.0, false))
+
+
+func test_armor_reduces_damage_but_min_one() -> void:
+	var h := Health.new(100.0)
+	h.armor = 3.0
+	assert_eq(h.take_damage(10.0), 7.0)
+	var h2 := Health.new(100.0)
+	h2.armor = 50.0
+	assert_eq(h2.take_damage(10.0), 1.0, "sempre pelo menos 1 de dano")
+
+
+func test_regen_heals_over_time() -> void:
+	var h := Health.new(100.0)
+	h.take_damage(20.0)
+	h.regen = 2.0
+	h.update(5.0)
+	assert_almost_eq(h.current, 90.0, 0.001)
+
+
+func test_god_mode_ignores_damage() -> void:
+	var h := Health.new(100.0)
+	h.god_mode = true
+	assert_eq(h.take_damage(999.0), 0.0)
+
+
+func test_character_stats_and_crit_roll() -> void:
+	var c := CharacterData.new()
+	c.max_health = 130.0
+	c.crit_chance = 1.0
+	c.crit_damage = 2.0
+	var s := PlayerStats.from_character(c)
+	assert_eq(s.max_health, 130.0)
+	var rng := RandomNumberGenerator.new()
+	var r := s.roll_damage(10.0, rng)
+	assert_almost_eq(r.x, 20.0 * Config.game.player_damage_multiplier, 0.001)
+	assert_eq(r.y, 1.0, "marcado como critico")

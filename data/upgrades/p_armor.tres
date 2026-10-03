@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_0bb1x"]
+
+[resource]
+script = ExtResource("1_0bb1x")
+id = &"p_armor"
+title = "Protecao Improvisada"
+description = "-1 de dano recebido por golpe."
+stat = &"armor"
+value = 1.0
+max_picks = 4
+tag = &"defesa"
+color = Color(0.45, 0.8, 1, 1)

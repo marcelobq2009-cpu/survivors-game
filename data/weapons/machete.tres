@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponData" format=3]
+
+[ext_resource type="PackedScene" path="res://game/weapons/melee_weapon.tscn" id="1_x78oe"]
+[ext_resource type="Script" path="res://game/weapons/weapon_data.gd" id="2_2yoec"]
+
+[resource]
+script = ExtResource("2_2yoec")
+id = &"machete"
+display_name = "Facao"
+description = "Golpe em arco na sua frente."
+scene = ExtResource("1_x78oe")
+color = Color(0.85, 0.95, 1, 1)
+damage = 14.0
+cooldown = 0.9
+area = 2.2
+knockback = 5.0
+uses_projectile_bonus = false
+sound_id = &"melee"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_txscv"]
+
+[resource]
+script = ExtResource("1_txscv")
+id = &"p_crit"
+title = "Mira Treinada"
+description = "+6% de chance de critico."
+stat = &"crit_chance"
+value = 0.06
+tag = &"critico"
+color = Color(1, 0.45, 0.35, 1)

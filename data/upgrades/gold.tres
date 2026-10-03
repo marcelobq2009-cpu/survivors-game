@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_ovl73"]
+
+[resource]
+script = ExtResource("1_ovl73")
+id = &"gold"
+title = "Saco de Moedas"
+description = "+30 de ouro."
+kind = 5
+value = 30.0
+max_picks = 0
+tag = &"reserva"
+color = Color(1, 0.85, 0.3, 1)

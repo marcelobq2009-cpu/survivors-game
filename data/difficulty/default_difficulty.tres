@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DifficultyProfile" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_apnv6"]
+[ext_resource type="Resource" path="res://data/enemies/boss_colossus.tres" id="2_2838l"]
+[ext_resource type="Resource" path="res://data/enemies/boss_mutant.tres" id="3_kt02u"]
+[ext_resource type="Script" path="res://game/enemies/difficulty_profile.gd" id="4_w54hn"]
+
+[resource]
+script = ExtResource("4_w54hn")
+bosses = Array[ExtResource("1_apnv6")]([ExtResource("2_2838l"), ExtResource("3_kt02u")])

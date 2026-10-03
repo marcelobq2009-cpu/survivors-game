@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Resource" path="res://data/weapons/pistol_gold.tres" id="1_ucu8j"]
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="2_rdg1l"]
+[ext_resource type="Resource" path="res://data/weapons/pistol.tres" id="3_dmacl"]
+
+[resource]
+script = ExtResource("2_rdg1l")
+id = &"evolve_pistol"
+title = "EVOLUCAO: Pistola Rajada"
+description = "Pistola Nv.5 + Mira Treinada: rajadas que atravessam."
+kind = 4
+weapon = ExtResource("3_dmacl")
+max_picks = 1
+tag = &"evolucao"
+requires_weapon_level = 5
+requires_upgrades = Array[StringName]([&"p_crit"])
+evolves_to = ExtResource("1_ucu8j")
+color = Color(1, 0.85, 0.2, 1)

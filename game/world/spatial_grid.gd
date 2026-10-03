@@ -1,18 +1,15 @@
 class_name SpatialGrid
 extends RefCounted
-## Grade espacial: divide o mundo em celulas para responder rapido
-## "quem esta perto deste ponto?" sem testar todos os inimigos.
-## E reconstruida a cada frame pelo EnemyManager (clear + insert).
-##
-## IMPORTANTE: usa `position` dos itens (mais barato que global_position).
-## Os itens devem ser filhos de um no que esta na origem do mundo.
+## Grade espacial: divide o chao em celulas para responder rapido
+## "quais zumbis estao perto deste ponto?" sem testar todos.
+## Reconstruida a cada frame pelo EnemyManager (clear + insert).
 
 var cell_size: float
 var _cells: Dictionary[Vector2i, Array] = {}
 var _count: int = 0
 
 
-func _init(p_cell_size: float = 64.0) -> void:
+func _init(p_cell_size: float = 2.0) -> void:
 	cell_size = p_cell_size
 
 
@@ -25,13 +22,13 @@ func size() -> int:
 	return _count
 
 
-func insert(item: Node2D) -> void:
-	var c := cell_of(item.position)
+func insert(agent: EnemyAgent) -> void:
+	var c := cell_of(agent.pos)
 	var cell: Variant = _cells.get(c)
 	if cell == null:
-		_cells[c] = [item]
+		_cells[c] = [agent]
 	else:
-		(cell as Array).append(item)
+		(cell as Array).append(agent)
 	_count += 1
 
 
@@ -39,9 +36,9 @@ func cell_of(pos: Vector2) -> Vector2i:
 	return Vector2i(floori(pos.x / cell_size), floori(pos.y / cell_size))
 
 
-## Preenche `result` com os itens a ate `radius` de `pos` (limpa antes).
+## Preenche `result` com os agentes a ate `radius` de `pos` (limpa antes).
 ## Reaproveitar o mesmo array evita alocar memoria todo frame.
-func query_radius(pos: Vector2, radius: float, result: Array[Node2D]) -> void:
+func query_radius(pos: Vector2, radius: float, result: Array[EnemyAgent]) -> void:
 	result.clear()
 	var r2 := radius * radius
 	var min_c := cell_of(pos - Vector2(radius, radius))
@@ -51,17 +48,17 @@ func query_radius(pos: Vector2, radius: float, result: Array[Node2D]) -> void:
 			var cell: Variant = _cells.get(Vector2i(cx, cy))
 			if cell == null:
 				continue
-			for item: Node2D in cell as Array:
-				if item.position.distance_squared_to(pos) <= r2:
-					result.append(item)
+			for a: EnemyAgent in cell as Array:
+				if a.pos.distance_squared_to(pos) <= r2:
+					result.append(a)
 
 
-## Item mais proximo de `pos` dentro de `max_radius` (ou null).
+## Agente mais proximo de `pos` dentro de `max_radius` (ou null).
 ## Procura em "aneis" de celulas crescentes e para cedo quando ja achou.
-func find_nearest(pos: Vector2, max_radius: float) -> Node2D:
+func find_nearest(pos: Vector2, max_radius: float) -> EnemyAgent:
 	var center := cell_of(pos)
 	var max_ring := ceili(max_radius / cell_size)
-	var best: Node2D = null
+	var best: EnemyAgent = null
 	var best_d2 := max_radius * max_radius
 	for ring: int in range(max_ring + 1):
 		# Celulas do anel `ring` estao a pelo menos (ring-1)*cell_size de pos.
@@ -75,9 +72,11 @@ func find_nearest(pos: Vector2, max_radius: float) -> Node2D:
 				var cell: Variant = _cells.get(Vector2i(cx, cy))
 				if cell == null:
 					continue
-				for item: Node2D in cell as Array:
-					var d2 := item.position.distance_squared_to(pos)
+				for a: EnemyAgent in cell as Array:
+					if not a.alive:
+						continue
+					var d2 := a.pos.distance_squared_to(pos)
 					if d2 <= best_d2:
 						best_d2 = d2
-						best = item
+						best = a
 	return best

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://game/enemies/enemy_data.gd" id="1_hu2os"]
+
+[resource]
+script = ExtResource("1_hu2os")
+id = &"boss_colossus"
+display_name = "Colosso"
+behavior = 2
+is_boss = true
+max_health = 1500.0
+contact_damage = 25.0
+xp_value = 80
+radius = 1.2
+knockback_resistance = 1.0
+charge_speed = 10.0
+charge_duration = 0.8
+gold_chance = 1.0
+gold_value = 25
+body_color = Color(0.3, 0.15, 0.15, 1)
+skin_color = Color(0.5, 0.55, 0.4, 1)
+model_scale = 2.6

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_hti5r"]
+[ext_resource type="Resource" path="res://data/weapons/smg.tres" id="2_wk4ds"]
+
+[resource]
+script = ExtResource("1_hti5r")
+id = &"unlock_smg"
+title = "Nova arma: Metralhadora"
+description = "Rajada rapida e imprecisa."
+kind = 0
+weapon = ExtResource("2_wk4ds")
+max_picks = 1
+weight = 1.2
+tag = &"arma"
+color = Color(0.55, 1, 0.5, 1)

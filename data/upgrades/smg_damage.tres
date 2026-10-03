@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://game/upgrades/upgrade_data.gd" id="1_e5tes"]
+[ext_resource type="Resource" path="res://data/weapons/smg.tres" id="2_l25mi"]
+
+[resource]
+script = ExtResource("1_e5tes")
+id = &"smg_damage"
+title = "Metralhadora: +Dano"
+description = "+1,5 de dano por bala."
+kind = 1
+weapon = ExtResource("2_l25mi")
+stat = &"damage"
+value = 1.5
+max_picks = 4
+tag = &"dano"
+color = Color(1, 0.82, 0.35, 1)
